@@ -6,25 +6,35 @@
             :class="[
                 'bg-white shadow-md z-30 hidden md:block',
                 'fixed md:relative h-screen',
-                'w-[180px]',
-                mediumScreenCollapsed && 'w-16',
-                'transform transition-transform duration-300 ease-in-out',
+                'w-[180px] lg:w-[220px] xl:w-[240px]',
+                mediumScreenCollapsed && 'w-16 lg:w-20',
+                'transform transition-all duration-300 ease-in-out',
             ]"
         >
+            <!-- <button
+                @click="toggleSidebar"
+                class="absolute right-0 top-16 -mr-3 bg-white rounded-full p-1 shadow-md border border-gray-200 hidden md:flex items-center justify-center"
+            >
+                <ChevronLeftIcon
+                    v-if="!mediumScreenCollapsed"
+                    class="w-4 h-4 text-gray-500"
+                />
+                <ChevronRightIcon v-else class="w-4 h-4 text-gray-500" />
+            </button> -->
             <!-- Logo -->
-            <div class="p-4 border-b flex items-center justify-center">
+            <div class="p-3 lg:p-4 border-b flex items-center justify-center">
                 <div v-if="!mediumScreenCollapsed" class="flex items-center">
                     <img
                         src="~/assets/images/aquaeyes-logo.png"
                         alt="AquaEyes"
-                        class="h-10 w-15"
+                        class="h-8 w-12 lg:h-10 lg:w-15"
                     />
                 </div>
                 <img
                     v-else
                     src="~/assets/images/aquaeyes-logo.png"
                     alt="AquaEyes"
-                    class="h-8 w-8"
+                    class="h-7 w-auto lg:h-8 lg:w-auto"
                 />
             </div>
 
@@ -45,6 +55,12 @@
                         <span v-if="!mediumScreenCollapsed" class="ml-3"
                             >Dashboard</span
                         >
+                        <div
+                            v-if="mediumScreenCollapsed"
+                            class="absolute left-full ml-2 bg-gray-800 text-white text-xs rounded py-1 px-2 invisible group-hover:visible whitespace-nowrap z-50"
+                        >
+                            Dashboard
+                        </div>
                     </NuxtLink>
 
                     <!-- History -->
@@ -61,6 +77,12 @@
                         <span v-if="!mediumScreenCollapsed" class="ml-3"
                             >History</span
                         >
+                        <div
+                            v-if="mediumScreenCollapsed"
+                            class="absolute left-full ml-2 bg-gray-800 text-white text-xs rounded py-1 px-2 invisible group-hover:visible whitespace-nowrap z-50"
+                        >
+                            Dashboard
+                        </div>
                     </NuxtLink>
 
                     <!-- Alerts -->
@@ -77,6 +99,12 @@
                         <span v-if="!mediumScreenCollapsed" class="ml-3"
                             >Alerts</span
                         >
+                        <div
+                            v-if="mediumScreenCollapsed"
+                            class="absolute left-full ml-2 bg-gray-800 text-white text-xs rounded py-1 px-2 invisible group-hover:visible whitespace-nowrap z-50"
+                        >
+                            Dashboard
+                        </div>
                     </NuxtLink>
                 </nav>
             </div>
@@ -85,10 +113,16 @@
         <!-- Mobile and Main Content container -->
         <div class="flex-1 flex flex-col">
             <!-- Mobile Navigation -->
-            <TheNavigation class="md:hidden" />
+
+            <TheNavigation
+                class="md:hidden sticky top-0 z-40 bg-white shadow-sm"
+            />
 
             <!-- Main Content -->
-            <main class="flex-1 p-4 md:p-6 md:ml-0">
+
+            <main
+                class="flex-1 p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 md:ml-0 max-w-full overflow-x-hidden"
+            >
                 <slot />
             </main>
         </div>
@@ -102,6 +136,8 @@ import {
     ChartBarIcon,
     ClockIcon,
     BellAlertIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
 } from "@heroicons/vue/24/outline";
 
 // For medium screen collapse (expanded by default on desktop)
@@ -112,11 +148,24 @@ const toggleSidebar = () => {
     mediumScreenCollapsed.value = !mediumScreenCollapsed.value;
 };
 
+const handleResize = () => {
+    if (window.innerWidth < 1024 && window.innerWidth >= 768) {
+        mediumScreenCollapsed.value = true;
+    } else if (window.innerWidth >= 1024) {
+        mediumScreenCollapsed.value = false;
+    }
+};
+
 onMounted(() => {
-    // Optional: Add any initialization logic here
+    // Initial check
+    handleResize();
+
+    // Add resize listener
+    window.addEventListener("resize", handleResize);
 });
 
 onBeforeUnmount(() => {
-    // Optional: Add any cleanup logic here
+    // Clean up
+    window.removeEventListener("resize", handleResize);
 });
 </script>

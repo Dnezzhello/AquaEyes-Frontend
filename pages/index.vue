@@ -3,9 +3,10 @@
     <div class="p-2 md:p-4">
         <!-- header - responsive modifications -->
         <div
-            class="flex justify-between items-center mb-4 bg-white p-2 rounded-lg shadow"
+            class="flex justify-between items-center mb-3 md:mb-4 bg-white p-2 md:p-3 rounded-lg shadow"
         >
             <h1 class="text-xl md:text-2xl font-bold">Dashboard</h1>
+
             <div class="flex p-2 items-center">
                 <img
                     src="~/assets/images/lao-flag.png"
@@ -30,9 +31,9 @@
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4 mb-4"
         >
             <!-- stations -->
-            <div class="bg-white rounded-lg shadow p-3">
-                <p class="font-bold text-xl md:text-2xl">ສະຖານີ</p>
-                <div class="w-full max-w-sm mt-2 md:mt-4">
+            <div class="bg-white rounded-lg shadow p-3 flex flex-col">
+                <p class="font-bold text-xl md:text-2xl mb-1 md:mb-2">ສະຖານີ</p>
+                <div class="w-full mt-1 md:mt-3">
                     <div class="relative">
                         <select
                             class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-lg md:text-xl border border-slate-200 rounded-lg pl-2 md:pl-3 pr-8 py-2 md:py-3 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
@@ -59,7 +60,7 @@
                     </div>
                 </div>
                 <p
-                    class="text-xs md:text-sm text-center mt-1 md:mt-2 text-gray-700"
+                    class="text-xs md:text-sm text-center mt-auto pt-1 md:mt-2 text-gray-700"
                 >
                     ອັບເດດຫຼ້າສຸດ: ວັນທີ _ ເດືອນ _ ປີ ຄ.ສ _ ເວລາ _:_
                 </p>
@@ -70,7 +71,9 @@
                 <p class="font-bold text-xl md:text-2xl">
                     ສະຖານະຄວາມສ່ຽງປັດຈຸບັນ:
                 </p>
-                <div class="h-full flex flex-cols items-center justify-center">
+                <div
+                    class="h-full flex flex-cols items-center justify-center pb-2"
+                >
                     <p
                         class="text-aqua-info text-center font-bold text-3xl md:text-4xl"
                     >
@@ -82,9 +85,9 @@
             <!-- signal strength & battery -->
             <div class="flex flex-row sm:flex-col gap-x-2 gap-y-2">
                 <div
-                    class="bg-white w-1/2 sm:w-full h-16 sm:h-1/2 rounded-lg flex items-center justify-center shadow"
+                    class="bg-white w-1/2 sm:w-full h-16 sm:h-1/2 rounded-lg flex items-center justify-center shadow p-1 md:p-2"
                 >
-                    <div class="text-base md:text-lg">
+                    <div class="text-sm md:text-lg text-center">
                         ສະຖານະການເຊື່ອມຕໍ່:
                         <span class="text-aqua-green font-medium"
                             >ເຊື່ອມຕໍ່ແລ້ວ</span
@@ -92,9 +95,9 @@
                     </div>
                 </div>
                 <div
-                    class="bg-white w-1/2 sm:w-full h-16 sm:h-1/2 rounded-lg flex items-center justify-center shadow"
+                    class="bg-white w-1/2 sm:w-full h-16 sm:h-1/2 rounded-lg flex items-center justify-center shadow p-1 md:p-2"
                 >
-                    <div class="text-base md:text-lg">
+                    <div class="text-sm md:text-lg text-center">
                         ສະຖານະແບັດເຕີລີ:
                         <span class="font-bold">75%</span>
                     </div>
@@ -106,17 +109,21 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 mb-4">
             <!-- soil moisture -->
             <div
-                class="font-bold text-xl md:text-2xl bg-white rounded-lg shadow p-3 md:p-4 text-center"
+                class="bg-white rounded-lg shadow p-3 md:p-4 flex flex-col items-center"
             >
-                ຄວາມຊຸ່ມຂອງດິນ:
-                <span class="text-3xl md:text-4xl font-bold">75%</span>
+                <div class="font-bold text-lg md:text-2xl text-center">
+                    ຄວາມຊຸ່ມຂອງດິນ:
+                </div>
+                <span class="text-2xl md:text-4xl font-bold mt-1">75%</span>
             </div>
 
             <div
-                class="font-bold text-xl md:text-2xl bg-white rounded-lg shadow p-3 md:p-4 text-center"
+                class="bg-white rounded-lg shadow p-3 md:p-4 flex flex-col items-center"
             >
-                ຄວາມໄວການໄຫຼຂອງນ້ຳ:
-                <span class="text-3xl md:text-4xl font-bold"
+                <div class="font-bold text-lg md:text-2xl text-center">
+                    ຄວາມໄວການໄຫຼຂອງນ້ຳ:
+                </div>
+                <span class="text-2xl md:text-4xl font-bold mt-1"
                     >120 m<sup>3</sup>/s</span
                 >
             </div>
@@ -124,13 +131,15 @@
 
         <!-- Water level chart -->
         <div class="bg-white rounded-lg shadow-sm p-3 md:p-4 mb-4">
-            <h2 class="text-lg md:text-xl font-semibold mb-2 md:mb-4">
+            <h2
+                class="text-base md:text-xl font-semibold mb-2 md:mb-4 text-center sm:text-left"
+            >
                 ລະດັບນ້ຳປັດຈຸບັນ
             </h2>
             <ClientOnly>
-                <div v-if="waterLevelData.currentLevels" class="h-64 md:h-96">
+                <div v-if="waterLevelData.currentLevels" class="h-52 md:h-96">
                     <WaterLevelChart
-                    :key="$route.fullPath"
+                        :key="$route.fullPath"
                         :current-levels="waterLevelData.currentLevels"
                         :predicted-levels="waterLevelData.predictedLevels"
                         :bank-height="waterLevelData.bankHeight"
@@ -139,7 +148,7 @@
                 </div>
                 <template #fallback>
                     <div
-                        class="h-48 md:h-64 bg-gray-50 rounded flex items-center justify-center"
+                        class="h-40 md:h-64 bg-gray-50 rounded flex items-center justify-center"
                     >
                         <p class="text-gray-500">Loading Chart Data...</p>
                     </div>

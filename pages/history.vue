@@ -551,32 +551,11 @@
     </div>
 </template>
 
-<script setup lang="ts">
-
-
-// --- Interfaces (Optional but recommended) ---
-interface HistoryItem {
-    readingId: string | number;
-    deviceId: string;
-    sensorId: string;
-    timestamp: string | number | Date; // Adjust based on your actual data type
-    value: number | string;
-    unit: string;
-    header1: string; // Example additional data
-    header2: string; // Example additional data
-}
-
-interface Filters {
-    deviceId: string;
-    sensorId: string;
-    startDate: string; // Format YYYY-MM-DD
-    endDate: string; // Format YYYY-MM-DD
-}
-
+<script setup>
 // --- Reactive State ---
 const loading = ref(false);
-const error = ref<string | null>(null);
-const filters = reactive<Filters>({
+const error = ref(null);
+const filters = reactive({
     deviceId: "",
     sensorId: "",
     startDate: "",
@@ -584,7 +563,7 @@ const filters = reactive<Filters>({
 });
 
 const viewMode = ref("table"); // Added view mode toggle: 'table' or 'card'
-const rawData = ref<HistoryItem[]>([]); // Holds all fetched data
+const rawData = ref([]); // Holds all fetched data
 const currentPage = ref(1);
 const itemsPerPage = ref(10); // How many items to show per page
 
@@ -602,17 +581,17 @@ const fetchData = async () => {
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // *** MOCK DATA GENERATION - REPLACE WITH ACTUAL API CALL ***
-        const mockItems: HistoryItem[] = [];
+        const mockItems = [];
         const numItems = Math.floor(Math.random() * 50) + 5; // Generate 5 to 54 items
 
         for (let i = 1; i <= numItems; i++) {
             const deviceSuffix = String(Math.ceil(Math.random() * 3)).padStart(
                 3,
-                "0",
+                "0"
             );
             const sensorSuffix = String(Math.ceil(Math.random() * 5)).padStart(
                 3,
-                "0",
+                "0"
             );
             const matchesDeviceId =
                 !filters.deviceId || filters.deviceId === `dev-${deviceSuffix}`;
@@ -634,7 +613,7 @@ const fetchData = async () => {
                     deviceId: `dev-${deviceSuffix}`,
                     sensorId: `sensor-${sensorSuffix}`,
                     timestamp: new Date(
-                        Date.now() - Math.random() * 1000 * 3600 * 24 * 7,
+                        Date.now() - Math.random() * 1000 * 3600 * 24 * 7
                     ), // Random timestamp in last 7 days
                     value: (Math.random() * 100).toFixed(2),
                     unit: "Unit " + String.fromCharCode(65 + (i % 3)), // A, B, C
@@ -646,7 +625,7 @@ const fetchData = async () => {
         rawData.value = mockItems.sort(
             (a, b) =>
                 new Date(b.timestamp).getTime() -
-                new Date(a.timestamp).getTime(),
+                new Date(a.timestamp).getTime()
         ); // Sort by newest first
         // *** END MOCK DATA ***
     } catch (err) {
@@ -661,7 +640,7 @@ const fetchData = async () => {
 // --- Computed Properties ---
 const totalItems = computed(() => rawData.value.length);
 const totalPages = computed(() =>
-    Math.ceil(totalItems.value / itemsPerPage.value),
+    Math.ceil(totalItems.value / itemsPerPage.value)
 );
 
 const paginatedData = computed(() => {
@@ -671,7 +650,7 @@ const paginatedData = computed(() => {
 });
 
 // --- Pagination Logic ---
-const goToPage = (page: number) => {
+const goToPage = (page) => {
     if (page >= 1 && page <= totalPages.value) {
         currentPage.value = page;
     }
@@ -696,9 +675,9 @@ const paginationRange = computed(() => {
     const delta = 1; // How many pages to show around the current page
     const left = current - delta;
     const right = current + delta + 1;
-    const range: (number | string)[] = [];
-    const rangeWithDots: (number | string)[] = [];
-    let l: number | null = null;
+    const range = [];
+    const rangeWithDots = [];
+    let l = null;
 
     for (let i = 1; i <= last; i++) {
         if (i === 1 || i === last || (i >= left && i < right)) {
@@ -728,7 +707,7 @@ const applyFilters = () => {
 };
 
 // --- Utility Functions ---
-const formatTimestamp = (timestamp: string | number | Date): string => {
+const formatTimestamp = (timestamp) => {
     if (!timestamp) return "N/A";
     try {
         // Adjust formatting as needed (e.g., to locale string)

@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom utility classes based on your UI */
+@layer components {
+    .sidebar-icon {
+        @apply p-3 rounded-md cursor-pointer text-white hover:bg-white hover:text-aqua-primary transition-colors;
+    }
+
+    .sidebar-icon-active {
+        @apply bg-white text-aqua-primary;
+    }
+
+    .alert-critical {
+        @apply bg-red-100 border-l-4 border-aqua-critical;
+    }
+
+    .alert-warning {
+        @apply bg-yellow-100 border-l-4 border-aqua-warning;
+    }
+
+    .alert-info {
+        @apply bg-blue-100 border-l-4 border-aqua-info;
+    }
+
+    .btn-dismiss {
+        @apply bg-aqua-critical text-white px-4 py-2 rounded-md hover:bg-red-600;
+    }
+
+    .btn-confirm {
+        @apply bg-aqua-success text-white px-4 py-2 rounded-md hover:bg-green-600;
+    }
+
+    .status-badge {
+        @apply px-3 py-1 rounded-md font-medium;
+    }
+}

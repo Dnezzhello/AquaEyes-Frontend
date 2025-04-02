@@ -139,7 +139,7 @@
             <ClientOnly>
                 <div v-if="waterLevelData.currentLevels" class="h-52 md:h-96">
                     <WaterLevelChart
-                        :key="$route.fullPath"
+                        :key="`water-level-${componentKey}`"
                         :current-levels="waterLevelData.currentLevels"
                         :predicted-levels="waterLevelData.predictedLevels"
                         :bank-height="waterLevelData.bankHeight"
@@ -165,6 +165,7 @@
                 </h2>
                 <ClientOnly>
                     <BarChart
+                        :key="`rainfall-intensity-${componentKey}`"
                         v-if="rainfallData.intensity"
                         :chart-data="rainfallData.intensity"
                         :categories="rainfallData.timeLabels"
@@ -195,6 +196,7 @@
                 <ClientOnly>
                     <BarChart
                         v-if="rainfallData.accumulated"
+                        :key="`rainfall-accumulated-${componentKey}`"
                         :chart-data="rainfallData.accumulated"
                         :categories="daysOfWeek"
                         :series-name="'ການສະສົມຂອງນ້ຳຝົນຕໍ່ມື້'"
@@ -222,6 +224,9 @@ import { ref, onMounted } from "vue";
 import WaterLevelChart from "~/components/charts/LineChart.client.vue";
 import BarChart from "~/components/charts/BarChart.client.vue";
 
+// Add a component key to force re-render
+const componentKey = ref(0);
+
 // Sample data - in a real app, this would come from your API
 const daysOfWeek = ref([
     "ຈັນ",
@@ -247,9 +252,11 @@ const rainfallData = ref({
     timeLabels: ["05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00"],
 });
 
-// Fetch or set data when component mounts
-onMounted(async () => {
+const loadData = async () => {
     try {
+        // Increment the component key to force re-render
+        componentKey.value++;
+
         // Simulate fetching data
         await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -278,5 +285,41 @@ onMounted(async () => {
         console.error("Failed to fetch or set data:", error);
         // Handle error state
     }
+};
+
+// Run on page load and whenever the component is activated
+onMounted(() => {
+    loadData();
 });
+
+// Make sure we clean up properly
+onBeforeUnmount(() => {
+    // Reset data when component is unmounted
+    waterLevelData.value = {
+        currentLevels: null,
+        predictedLevels: null,
+        bankHeight: 14,
+    };
+
+    rainfallData.value = {
+        intensity: null,
+        accumulated: null,
+        timeLabels: [
+            "05:00",
+            "06:00",
+            "07:00",
+            "08:00",
+            "09:00",
+            "10:00",
+            "11:00",
+        ],
+    };
+});
+
+// Keep-alive hook
+if (typeof onActivated !== "undefined") {
+    onActivated(() => {
+        loadData();
+    });
+}
 </script>

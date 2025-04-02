@@ -1,14 +1,23 @@
 <template>
     <div class="p-4 md:p-6 lg:p-8 space-y-6 bg-gray-50 min-h-screen">
-        <h1
-            class="text-xl md:text-2xl font-semibold text-gray-800 bg-white p-3 rounded-lg shadow"
-        >
-            History Data
-        </h1>
+        <!-- Header with language selector -->
+        <div class="flex justify-between items-center mb-3 md:mb-4 bg-white p-2 md:p-3 rounded-lg shadow">
+            <h1 class="text-xl md:text-2xl font-bold">ຂໍ້ມູນທີ່ຜ່ານມາ</h1>
+            <!-- <div class="flex p-2 items-center">
+                <img src="~/assets/images/lao-flag.png" alt="" class="w-6 h-6 md:w-7 md:h-7 mr-1">
+                <div class="">
+                    <select id="devices" class="bg-white text-gray-900 text-xs md:text-sm rounded-xl block w-full px-2 md:px-3 py-1 md:py-2 text-center focus:outline-none">
+                        <option selected>ພາສາລາວ</option>
+                        <option value="US">ອັງກິດ</option>
+                        <option value="CA">ຈີນ</option>
+                    </select>
+                </div>
+            </div> -->
+        </div>
 
         <!-- Filters Section - Improved responsiveness -->
-        <div class="bg-white p-4 rounded-lg shadow space-y-4">
-            <h2 class="text-lg font-medium text-gray-700 mb-3">Filters</h2>
+        <div class="bg-white rounded-lg shadow p-3 mb-4">
+            <h2 class="font-bold text-lg md:text-xl mb-2 md:mb-3">ຕົວເລືອກ</h2>
             <div
                 class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end"
             >
@@ -16,17 +25,17 @@
                     <label
                         for="deviceId"
                         class="block text-sm font-medium text-gray-600 mb-1"
-                        >Device ID</label
+                        >ລະຫັດອຸປະກອນ</label
                     >
                     <select
                         id="deviceId"
                         v-model="filters.deviceId"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     >
-                        <option value="">All Devices</option>
+                        <option value="">ອຸປະກອນທັງໝົດ</option>
                         <option value="dev-001">Device 001</option>
-                        <option value="dev-002">Device 002</option>
-                        <option value="dev-003">Device 003</option>
+                        <!-- <option value="dev-002">Device 002</option>
+                        <option value="dev-003">Device 003</option> -->
                     </select>
                 </div>
 
@@ -34,7 +43,7 @@
                     <label
                         for="sensorId"
                         class="block text-sm font-medium text-gray-600 mb-1"
-                        >Sensor ID</label
+                        >ລະຫັດເຊັນເຊີ</label
                     >
                     <input
                         type="text"
@@ -49,7 +58,7 @@
                     <label
                         for="startDate"
                         class="block text-sm font-medium text-gray-600 mb-1"
-                        >Start Date</label
+                        >ເວລາເລີ່ມຕົ້ນ</label
                     >
                     <input
                         type="date"
@@ -62,7 +71,7 @@
                     <label
                         for="endDate"
                         class="block text-sm font-medium text-gray-600 mb-1"
-                        >End Date</label
+                        >ເວລາສິ້ນສຸດ</label
                     >
                     <input
                         type="date"
@@ -100,7 +109,7 @@
                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             ></path>
                         </svg>
-                        {{ loading ? "Loading..." : "ດຶງຂໍ້ມູນ" }}
+                        {{ loading ? "ກຳລັງໂຫຼດ..." : "ດຶງຂໍ້ມູນ" }}
                     </button>
                 </div>
             </div>
@@ -122,7 +131,7 @@
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
                         ]"
                     >
-                        Table
+                    ຮູບແບບຕາຕະລາງ
                     </button>
                     <button
                         @click="viewMode = 'card'"
@@ -133,7 +142,7 @@
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
                         ]"
                     >
-                        Cards
+                        ຮູບແບບບັດ
                     </button>
                 </div>
             </div>
@@ -543,7 +552,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue";
+
 
 // --- Interfaces (Optional but recommended) ---
 interface HistoryItem {

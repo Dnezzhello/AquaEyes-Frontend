@@ -5,10 +5,10 @@
         <div
             :class="[
                 'bg-white shadow-md z-30 hidden md:block',
-                'fixed md:relative h-screen',
-                'w-[180px] lg:w-[220px] xl:w-[240px]',
+                'fixed md:relative min-h-screen',
+                'w-[180px] lg:w-[220px] xl:w-[240px] 2xl:w-[260px]',
                 mediumScreenCollapsed && 'w-16 lg:w-20',
-                'transform transition-all duration-300 ease-in-out',
+                'transform transition-all duration-200 ease-in-out',
             ]"
         >
             <!-- <button
@@ -27,14 +27,14 @@
                     <img
                         src="~/assets/images/aquaeyes-logo.png"
                         alt="AquaEyes"
-                        class="h-8 w-12 lg:h-10 lg:w-15"
+                        class="h-8 w-auto lg:h-10 lg:w-auto"
                     />
                 </div>
                 <img
                     v-else
                     src="~/assets/images/aquaeyes-logo.png"
                     alt="AquaEyes"
-                    class="h-7 w-auto lg:h-8 lg:w-auto"
+                    class="h-6 w-auto lg:h-8 lg:w-auto"
                 />
             </div>
 
@@ -75,7 +75,7 @@
                     >
                         <ClockIcon class="w-6 h-6" />
                         <span v-if="!mediumScreenCollapsed" class="ml-3"
-                            >History</span
+                            >ຂໍ້ມູນທີ່ຜ່ານມາ</span
                         >
                         <div
                             v-if="mediumScreenCollapsed"
@@ -87,7 +87,7 @@
 
                     <!-- Alerts -->
                     <NuxtLink
-                        to="/alert-list"
+                        to="/alerts"
                         active-class="bg-blue-500 text-white"
                         class="flex items-center p-3 mb-2 rounded-lg transition-colors hover:bg-blue-100 text-gray-700"
                         :class="{
@@ -97,7 +97,7 @@
                     >
                         <BellAlertIcon class="w-6 h-6" />
                         <span v-if="!mediumScreenCollapsed" class="ml-3"
-                            >Alerts</span
+                            >ປະຫວັດການແຈ້ງເຕືອນ</span
                         >
                         <div
                             v-if="mediumScreenCollapsed"
@@ -121,9 +121,9 @@
             <!-- Main Content -->
 
             <main
-                class="flex-1 p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 md:ml-0 max-w-full overflow-x-hidden"
+                class="flex-1 flex flex-col max-w-screen-2xl mx-auto"
             >
-                <slot />
+                <slot class="" />
             </main>
         </div>
     </div>

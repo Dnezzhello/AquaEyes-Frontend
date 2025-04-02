@@ -11,7 +11,7 @@
                 <img
                     src="~/assets/images/lao-flag.png"
                     alt=""
-                    class="w-6 h-6 md:w-7 md:h-7 mr-1"
+                    class="w-auto h-6 md:w-auto md:h-7 mr-1"
                 />
                 <div class="">
                     <select

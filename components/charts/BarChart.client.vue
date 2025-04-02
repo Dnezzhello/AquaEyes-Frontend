@@ -144,6 +144,17 @@ const chartOptions = computed(() => ({
             },
           },
         },
+        yaxis: {
+          title: {
+            text: props.yAxisTitle, // Keep the title text
+            style: {
+              fontSize: "10px",
+            },
+          },
+          labels: {
+            show: true, // Ensure labels are visible
+          },
+        },
       },
     },
     {
@@ -165,7 +176,13 @@ const chartOptions = computed(() => ({
         },
         yaxis: {
           title: {
-            show: false,
+            text: props.yAxisTitle, // Keep the title text
+            style: {
+              fontSize: "10px",
+            },
+          },
+          labels: {
+            show: true, // Ensure labels are visible
           },
         },
       },

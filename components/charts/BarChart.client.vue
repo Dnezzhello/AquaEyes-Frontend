@@ -68,6 +68,24 @@ const chartOptions = computed(() => ({
     parentHeightOffset: 0,
     redrawOnWindowResize: true,
   },
+  annotations: {
+    yaxis: [
+      {
+        y: 150, // Threshold value for rainfall intensity
+        borderColor: "#F97316",
+        strokeDashArray: 4,
+        label: {
+          borderColor: "#F97316",
+          style: {
+            color: "#F97316",
+            fontSize: "10px",
+            fontWeight: "bold",
+          },
+          text: "ລະດັບເຝົ້າລະວັງ",
+        },
+      },
+    ],
+  },
   plotOptions: {
     bar: {
       borderRadius: 0,

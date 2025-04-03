@@ -162,11 +162,33 @@ const chartOptions = computed(() => ({
           style: {
             color: "#fff",
             background: "#10B981",
+            fontSize: "12px",
+            fontWeight: "bold",
           },
           text: "ຄວາມສູງຂອງຕາຝັ່ງ",
         },
       },
+      {
+        y: props.bankHeight * 0.8, // Warning level at 80% of bank height
+        borderColor: "#F97316",
+        strokeDashArray: 4,
+        label: {
+          borderColor: "#F97316",
+          style: {
+            color: "#F97316",
+            //background: "#F97316",
+            fontSize: "10px",
+            fontWeight: "bold",
+          },
+          text: "ລະດັບເຝົ້າລະວັງ",
+        },
+      },
     ],
+  },
+  stroke: {
+    curve: "smooth",
+    width: [3, 2], // Thicker line for current
+    dashArray: [0, 4], // Solid for current, dashed for predicted
   },
   responsive: [
     {

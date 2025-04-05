@@ -1,7 +1,9 @@
 <template>
     <div class="p-4 md:p-6 lg:p-8 space-y-6 bg-gray-50 min-h-screen">
         <!-- Header with language selector -->
-        <div class="flex justify-between items-center mb-3 md:mb-4 bg-white p-2 md:p-3 rounded-lg shadow">
+        <div
+            class="flex justify-between items-center mb-3 md:mb-4 bg-white p-2 md:p-3 rounded-lg shadow"
+        >
             <h1 class="text-xl md:text-2xl font-bold">ຂໍ້ມູນທີ່ຜ່ານມາ</h1>
             <!-- <div class="flex p-2 items-center">
                 <img src="~/assets/images/lao-flag.png" alt="" class="w-6 h-6 md:w-7 md:h-7 mr-1">
@@ -131,7 +133,7 @@
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
                         ]"
                     >
-                    ຮູບແບບຕາຕະລາງ
+                        ຮູບແບບຕາຕະລາງ
                     </button>
                     <button
                         @click="viewMode = 'card'"
@@ -587,11 +589,11 @@ const fetchData = async () => {
         for (let i = 1; i <= numItems; i++) {
             const deviceSuffix = String(Math.ceil(Math.random() * 3)).padStart(
                 3,
-                "0"
+                "0",
             );
             const sensorSuffix = String(Math.ceil(Math.random() * 5)).padStart(
                 3,
-                "0"
+                "0",
             );
             const matchesDeviceId =
                 !filters.deviceId || filters.deviceId === `dev-${deviceSuffix}`;
@@ -613,10 +615,10 @@ const fetchData = async () => {
                     deviceId: `dev-${deviceSuffix}`,
                     sensorId: `sensor-${sensorSuffix}`,
                     timestamp: new Date(
-                        Date.now() - Math.random() * 1000 * 3600 * 24 * 7
+                        Date.now() - Math.random() * 1000 * 3600 * 24 * 7,
                     ), // Random timestamp in last 7 days
                     value: (Math.random() * 100).toFixed(2),
-                    unit: "Unit " + String.fromCharCode(65 + (i % 3)), // A, B, C
+                    unit: `Unit  + ${String.fromCharCode(65 + (i % 3))}`, // A, B, C
                     header1: `Header A-${i}`,
                     header2: `Header B-${i}`,
                 });
@@ -625,7 +627,7 @@ const fetchData = async () => {
         rawData.value = mockItems.sort(
             (a, b) =>
                 new Date(b.timestamp).getTime() -
-                new Date(a.timestamp).getTime()
+                new Date(a.timestamp).getTime(),
         ); // Sort by newest first
         // *** END MOCK DATA ***
     } catch (err) {
@@ -640,7 +642,7 @@ const fetchData = async () => {
 // --- Computed Properties ---
 const totalItems = computed(() => rawData.value.length);
 const totalPages = computed(() =>
-    Math.ceil(totalItems.value / itemsPerPage.value)
+    Math.ceil(totalItems.value / itemsPerPage.value),
 );
 
 const paginatedData = computed(() => {
@@ -685,7 +687,7 @@ const paginationRange = computed(() => {
         }
     }
 
-    for (let i of range) {
+    for (const i of range) {
         if (l !== null) {
             if (i - l === 2) {
                 rangeWithDots.push(l + 1);

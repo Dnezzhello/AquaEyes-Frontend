@@ -312,7 +312,327 @@
     </div>
   </div>
 </template>
-<script setup>
+<!-- <script setup>
+import { ref, onMounted, computed, watch, onBeforeUnmount } from "vue";
+import LineChart from "~/components/charts/LineChart.client.vue";
+import BarChart from "~/components/charts/BarChart.client.vue";
+
+// Get API functions from the composable
+const { fetchDevices, fetchDeviceReadings, fetchAlerts } = useApi();
+
+// State variables
+const devices = ref([]);
+const selectedDevice = ref(null);
+const selectedDeviceDetails = ref(null);
+const waterLevelReadings = ref([]);
+const rainfallReadings = ref([]);
+const soilMoistureReadings = ref([]);
+const flowRateReadings = ref([]);
+const recentAlerts = ref([]);
+const loading = ref({
+    devices: false,
+    readings: false,
+    alerts: false,
+});
+const error = ref({
+    devices: null,
+    readings: null,
+    alerts: null,
+});
+
+// Chart data for water level
+const waterLevelData = computed(() => {
+    if (!waterLevelReadings.value.length) return [];
+
+    // Get last 24 readings or fewer if we don't have that many
+    const readings = [...waterLevelReadings.value]
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 24)
+        .reverse();
+
+    return readings.map((reading) => reading.value);
+});
+
+// Chart data for rainfall
+const rainfallData = computed(() => {
+    if (!rainfallReadings.value.length) return [];
+
+    // Get last 7 days of rainfall data
+    const readings = [...rainfallReadings.value]
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 7)
+        .reverse();
+
+    return readings.map((reading) => reading.value);
+});
+
+// Chart data for soil moisture
+const soilMoistureData = computed(() => {
+    if (!soilMoistureReadings.value.length) return [];
+
+    // Get last 7 readings
+    const readings = [...soilMoistureReadings.value]
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 7)
+        .reverse();
+
+    return readings.map((reading) => reading.value);
+});
+
+// Chart data for flow rate
+const flowRateData = computed(() => {
+    if (!flowRateReadings.value.length) return [];
+
+    // Get last 7 readings
+    const readings = [...flowRateReadings.value]
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 7)
+        .reverse();
+
+    return readings.map((reading) => reading.value);
+});
+
+// Chart labels for timestamps
+const timeLabels = computed(() => {
+    if (!waterLevelReadings.value.length) {
+        return Array(7)
+            .fill("")
+            .map((_, i) => `ຕົວຢ່າງ ${i + 1}`);
+    }
+
+    // Format the timestamps as hour:minute
+    return waterLevelReadings.value
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 24)
+        .reverse()
+        .map((reading) => {
+            const date = new Date(reading.timestamp);
+            return `${date.getHours()}:${date.getMinutes().toString().padStart(2, "0")}`;
+        });
+});
+
+// Chart labels for days
+const dayLabels = computed(() => {
+    // Get the last 7 days as labels
+    const days = ["ຈັນ", "ອັງຄານ", "ພຸດ", "ພະຫັດ", "ສຸກ", "ເສົາ", "ອາທິດ"];
+    const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+    // Reorder the days so that today is the last day
+    return Array(7)
+        .fill()
+        .map((_, i) => {
+            // Calculate the day index, wrapping around if needed
+            const dayIndex = (today - 6 + i) % 7;
+            // Convert from 0-based (Sunday = 0) to 1-based (Monday = 0)
+            return days[(dayIndex + 6) % 7];
+        });
+});
+
+// Water level prediction data (mock data for now)
+const predictedLevels = computed(() => {
+    // Create some basic prediction data based on current levels
+    if (!waterLevelData.value.length) return [];
+
+    const lastLevel = waterLevelData.value[waterLevelData.value.length - 1];
+    // Simple linear projection for next 3 data points
+    return [
+        null,
+        null,
+        null,
+        null,
+        lastLevel * 1.05,
+        lastLevel * 1.1,
+        lastLevel * 1.15,
+    ];
+});
+
+// Computed for bank height threshold
+const bankHeight = computed(() => {
+    if (!selectedDeviceDetails.value || !selectedDeviceDetails.value.sensors) {
+        return 500; // Default value if we don't have threshold data
+    }
+
+    // Find the water level sensor
+    const waterLevelSensor = selectedDeviceDetails.value.sensors.find(
+        (sensor) => sensor.type === "water_level",
+    );
+
+    if (!waterLevelSensor || !waterLevelSensor.thresholds) {
+        return 500; // Default value
+    }
+
+    return waterLevelSensor.thresholds.critical || 500;
+});
+
+// Fetch devices when component mounts
+onMounted(async () => {
+    await fetchAllDevices();
+});
+
+// Fetch all devices
+async function fetchAllDevices() {
+    try {
+        loading.value.devices = true;
+        error.value.devices = null;
+
+        devices.value = await fetchDevices();
+
+        if (devices.value.length > 0) {
+            // Select the first device by default
+            selectedDevice.value = devices.value[0].device_id;
+            selectedDeviceDetails.value = devices.value[0];
+
+            // Load data for selected device
+            await Promise.all([
+                loadDeviceReadings(selectedDevice.value),
+                loadDeviceAlerts(selectedDevice.value),
+            ]);
+        }
+    } catch (err) {
+        console.error("Error fetching devices:", err);
+        error.value.devices = "Failed to fetch devices. Please try again.";
+    } finally {
+        loading.value.devices = false;
+    }
+}
+
+// Load device sensor readings
+async function loadDeviceReadings(deviceId) {
+    try {
+        loading.value.readings = true;
+        error.value.readings = null;
+
+        // Fetch water level readings
+        const waterLevel = await fetchDeviceReadings(deviceId, "water_level");
+        waterLevelReadings.value = waterLevel;
+
+        // Fetch rainfall readings
+        const rainfall = await fetchDeviceReadings(deviceId, "rainfall");
+        rainfallReadings.value = rainfall;
+
+        // Fetch soil moisture readings
+        const soilMoisture = await fetchDeviceReadings(
+            deviceId,
+            "soil_moisture",
+        );
+        soilMoistureReadings.value = soilMoisture;
+
+        // Fetch flow rate readings
+        const flowRate = await fetchDeviceReadings(deviceId, "flow_rate");
+        flowRateReadings.value = flowRate;
+    } catch (err) {
+        console.error("Error fetching readings:", err);
+        error.value.readings =
+            "Failed to fetch sensor readings. Please try again.";
+    } finally {
+        loading.value.readings = false;
+    }
+}
+
+// Load device alerts
+async function loadDeviceAlerts(deviceId) {
+    try {
+        loading.value.alerts = true;
+        error.value.alerts = null;
+
+        const alerts = await fetchAlerts(deviceId);
+
+        // Sort alerts by timestamp (newest first) and take the top 5
+        recentAlerts.value = alerts
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, 5);
+    } catch (err) {
+        console.error("Error fetching alerts:", err);
+        error.value.alerts = "Failed to fetch alerts. Please try again.";
+    } finally {
+        loading.value.alerts = false;
+    }
+}
+
+// Format date for display
+function formatDate(dateString) {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+    return date.toLocaleString("lo-LA", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+}
+
+// Format alert type
+function formatAlertType(type) {
+    switch (type) {
+        case "flood_warning":
+            return "ເຕືອນໄພນ້ຳຖ້ວມ";
+        case "sensor_failure":
+            return "ເຊັນເຊີເສຍຫາຍ";
+        case "battery_low":
+            return "ແບັດເຕີຣີຕ່ຳ";
+        case "connection_loss":
+            return "ການເຊື່ອມຕໍ່ຂາດ";
+        default:
+            return type;
+    }
+}
+
+// Watch for changes to selectedDevice and reload data
+watch(selectedDevice, async (newDeviceId) => {
+    if (newDeviceId) {
+        // Find the selected device details
+        selectedDeviceDetails.value = devices.value.find(
+            (d) => d.device_id === newDeviceId,
+        );
+
+        // Reload data for the new device
+        await Promise.all([
+            loadDeviceReadings(newDeviceId),
+            loadDeviceAlerts(newDeviceId),
+        ]);
+    }
+});
+
+// Function to simulate readings (for testing without backend)
+function simulateReading() {
+    // This is just for testing UI without backend connection
+    const randomValue = 100 + Math.random() * 50;
+    waterLevelReadings.value.push({
+        timestamp: new Date().toISOString(),
+        value: randomValue,
+        unit: "cm",
+    });
+
+    // Reload computed values
+    if (waterLevelReadings.value.length > 50) {
+        waterLevelReadings.value.shift(); // Remove oldest reading if we have too many
+    }
+}
+
+// Refresh data every 30 seconds
+let refreshInterval;
+onMounted(() => {
+    refreshInterval = setInterval(() => {
+        if (selectedDevice.value) {
+            loadDeviceReadings(selectedDevice.value);
+            loadDeviceAlerts(selectedDevice.value);
+        }
+    }, 30000);
+});
+
+// Clean up interval when component unmounts
+onBeforeUnmount(() => {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+    }
+});
+
+
+</script> -->
+
+ <script setup>
 import { ref, onMounted } from "vue";
 import WaterLevelChart from "~/components/charts/LineChart.client.vue";
 import BarChart from "~/components/charts/BarChart.client.vue";
@@ -411,4 +731,4 @@ if (typeof onActivated !== "undefined") {
     loadData();
   });
 }
-</script>
+</script> 

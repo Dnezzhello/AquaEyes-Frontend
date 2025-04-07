@@ -1,5 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.API_BASE_URL || "http://localhost:4558",
+    },
+  },
   devtools: { enabled: false },
   css: ["~/assets/css/main.css"],
   plugins: ["~/plugins/apexcharts.js"],

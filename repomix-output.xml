@@ -1,0 +1,4079 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+<additional_info>
+
+</additional_info>
+
+</file_summary>
+
+<directory_structure>
+assets/
+  css/
+    main.css
+components/
+  badges/
+    SeverityBadge.vue
+    StatusBadge.vue
+  cards/
+    AlertCard.vue
+  charts/
+    BarChart.client.vue
+    LineChart.client.vue
+  icons/
+    DeviceIcon.vue
+  modals/
+    AlertModal.vue
+  TheNavigation.vue
+layouts/
+  default.vue
+pages/
+  alerts/
+    [alertId]/
+      index.vue
+    index.vue
+  history.vue
+  index.vue
+plugins/
+  apexcharts.js
+public/
+  robots.txt
+server/
+  tsconfig.json
+.gitignore
+app.vue
+nuxt.config.ts
+package.json
+README.md
+tailwind.config.js
+tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="assets/css/main.css">
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom utility classes based on your UI */
+@layer components {
+    .sidebar-icon {
+        @apply p-3 rounded-md cursor-pointer text-white hover:bg-white hover:text-aqua-primary transition-colors;
+    }
+
+    .sidebar-icon-active {
+        @apply bg-white text-aqua-primary;
+    }
+
+    .alert-critical {
+        @apply bg-red-100 border-l-4 border-aqua-critical;
+    }
+
+    .alert-warning {
+        @apply bg-yellow-100 border-l-4 border-aqua-warning;
+    }
+
+    .alert-info {
+        @apply bg-blue-100 border-l-4 border-aqua-info;
+    }
+
+    .btn-dismiss {
+        @apply bg-aqua-critical text-white px-4 py-2 rounded-md hover:bg-red-600;
+    }
+
+    .btn-confirm {
+        @apply bg-aqua-success text-white px-4 py-2 rounded-md hover:bg-green-600;
+    }
+
+    .status-badge {
+        @apply px-3 py-1 rounded-md font-medium;
+    }
+}
+</file>
+
+<file path="components/badges/SeverityBadge.vue">
+<!-- components/badges/SeverityBadge.vue -->
+<template>
+    <span 
+      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+      :class="badgeClass"
+    >
+      {{ severityText }}
+    </span>
+  </template>
+  
+  <script setup>
+  import { computed } from 'vue';
+  
+  const props = defineProps({
+    severity: {
+      type: String,
+      required: true,
+      validator: (value) => ['info', 'warning', 'danger', 'critical'].includes(value)
+    }
+  });
+  
+  const badgeClass = computed(() => {
+    switch (props.severity) {
+      case 'info':
+        return 'bg-blue-100 text-blue-800';
+      case 'warning':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'danger':
+        return 'bg-orange-100 text-orange-800';
+      case 'critical':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  });
+  
+  const severityText = computed(() => {
+    switch (props.severity) {
+      case 'info':
+        return 'ຂໍ້ມູນ';
+      case 'warning':
+        return 'ເຕືອນ';
+      case 'danger':
+        return 'ອັນຕະລາຍ';
+      case 'critical':
+        return 'ວິກິດ';
+      default:
+        return props.severity;
+    }
+  });
+  </script>
+</file>
+
+<file path="components/badges/StatusBadge.vue">
+<!-- components/badges/StatusBadge.vue -->
+<template>
+    <span 
+      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+      :class="badgeClass"
+    >
+      {{ statusText }}
+    </span>
+  </template>
+  
+  <script setup>
+  import { computed } from 'vue';
+  
+  const props = defineProps({
+    status: {
+      type: String,
+      required: true,
+      validator: (value) => ['pending', 'sent', 'delivered', 'failed'].includes(value)
+    }
+  });
+  
+  const badgeClass = computed(() => {
+    switch (props.status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'sent':
+        return 'bg-blue-100 text-blue-800';
+      case 'delivered':
+        return 'bg-green-100 text-green-800';
+      case 'failed':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  });
+  
+  const statusText = computed(() => {
+    switch (props.status) {
+      case 'pending':
+        return 'ລໍຖ້າ';
+      case 'sent':
+        return 'ສົ່ງແລ້ວ';
+      case 'delivered':
+        return 'ສົ່ງສຳເລັດ';
+      case 'failed':
+        return 'ລົ້ມເຫລວ';
+      default:
+        return props.status;
+    }
+  });
+  </script>
+</file>
+
+<file path="components/cards/AlertCard.vue">
+<!-- components/cards/AlertCard.vue -->
+<template>
+    <div 
+      class="mb-2 p-3 rounded-lg shadow bg-white relative flex hover:bg-gray-50 transition-colors duration-150" 
+      @click="$emit('click', alert)"
+    >
+      <div
+        :class="[
+          'absolute left-0 top-0 bottom-0 w-1.5 rounded-l-lg',
+          alert.type === 'critical'
+            ? 'bg-red-500'
+            : alert.type === 'warning'
+              ? 'bg-yellow-400'
+              : 'bg-blue-500',
+        ]"
+      ></div>
+      <div class="pl-4 flex-1">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center">
+            <div
+              :class="[
+                'flex-shrink-0 p-1 rounded-full',
+                alert.type === 'critical'
+                  ? 'text-red-500'
+                  : alert.type === 'warning'
+                    ? 'text-yellow-500'
+                    : 'text-blue-500',
+              ]"
+            >
+              <ExclamationCircleIcon
+                v-if="alert.type === 'critical'"
+                class="w-5 h-5"
+              />
+              <ExclamationTriangleIcon
+                v-if="alert.type === 'warning'"
+                class="w-5 h-5"
+              />
+              <InformationCircleIcon
+                v-if="alert.type === 'info'"
+                class="w-5 h-5"
+              />
+            </div>
+            <span class="ml-2 font-semibold capitalize">{{ alert.type }}</span>
+          </div>
+          <span class="text-sm text-gray-500">{{ alert.time }}</span>
+        </div>
+        <p class="mt-1 text-sm md:text-base">
+          {{ alert.message }}
+        </p>
+      </div>
+    </div>
+  </template>
+  
+  <script setup>
+  import {
+    ExclamationCircleIcon,
+    ExclamationTriangleIcon,
+    InformationCircleIcon,
+  } from "@heroicons/vue/24/outline";
+  
+  // Define props
+  const props = defineProps({
+    alert: {
+      type: Object,
+      required: true,
+      default: () => ({
+        type: 'info',
+        time: '',
+        message: '',
+        id: null
+      })
+    }
+  });
+  
+  // Define emits
+  defineEmits(['click']);
+  </script>
+</file>
+
+<file path="components/icons/DeviceIcon.vue">
+<!-- components/icons/DeviceIcon.vue -->
+<template>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="h-5 w-5"
+    :class="classes"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+    />
+  </svg>
+</template>
+  
+  <script setup>
+defineProps({
+  classes: {
+    type: String,
+    default: "",
+  },
+});
+</script>
+</file>
+
+<file path="components/modals/AlertModal.vue">
+<!-- components/AlertModal.vue -->
+<template>
+    <div
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+    >
+        <div
+            class="bg-white rounded-lg shadow-lg max-w-md w-full mx-auto overflow-hidden"
+        >
+            <div class="p-6">
+                <!-- Modal Icon and Title -->
+                <div class="flex justify-center mb-4">
+                    <div v-if="type === 'critical'" class="text-red-500">
+                        <div
+                            class="w-20 h-20 rounded-full border-4 border-red-500 flex items-center justify-center mx-auto"
+                        >
+                            <ExclamationCircleIcon class="w-12 h-12" />
+                        </div>
+                        <h3 class="mt-2 text-xl font-bold text-center">
+                            {{ title }}
+                        </h3>
+                    </div>
+
+                    <div v-if="type === 'warning'" class="text-yellow-500">
+                        <div
+                            class="w-20 h-20 rounded-full border-4 border-yellow-400 flex items-center justify-center mx-auto"
+                        >
+                            <ExclamationTriangleIcon class="w-12 h-12" />
+                        </div>
+                        <h3 class="mt-2 text-xl font-bold text-center">
+                            {{ title }}
+                        </h3>
+                    </div>
+
+                    <div v-if="type === 'info'" class="text-blue-500">
+                        <div
+                            class="w-20 h-20 rounded-full border-4 border-blue-500 flex items-center justify-center mx-auto"
+                        >
+                            <InformationCircleIcon class="w-12 h-12" />
+                        </div>
+                        <h3 class="mt-2 text-xl font-bold text-center">
+                            {{ title }}
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Modal Content -->
+                <div class="text-center mb-6">
+                    <p>{{ message }}</p>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="flex gap-2 justify-center">
+                    <button
+                        @click="$emit('dismiss')"
+                        class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                    >
+                        Dismiss
+                    </button>
+                    <button
+                        @click="$emit('confirm')"
+                        class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                    >
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import {
+    ExclamationCircleIcon,
+    ExclamationTriangleIcon,
+    InformationCircleIcon,
+} from "@heroicons/vue/24/outline";
+
+defineProps({
+    type: {
+        type: String,
+        required: true,
+        validator: (value) => ["critical", "warning", "info"].includes(value),
+    },
+    title: {
+        type: String,
+        required: true,
+    },
+    message: {
+        type: String,
+        required: true,
+    },
+});
+
+defineEmits(["close", "dismiss", "confirm"]);
+</script>
+</file>
+
+<file path="plugins/apexcharts.js">
+// apex chart plugin
+export default defineNuxtPlugin((nuxtApp) => {
+  // Only run on client-side
+  if (process.client) {
+    // Import dynamically on client side only
+    import("vue3-apexcharts").then((module) => {
+      const VueApexCharts = module.default;
+      nuxtApp.vueApp.use(VueApexCharts);
+    });
+  }
+});
+</file>
+
+<file path="public/robots.txt">
+
+</file>
+
+<file path="server/tsconfig.json">
+{
+  "extends": "../.nuxt/tsconfig.server.json"
+}
+</file>
+
+<file path=".gitignore">
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example
+</file>
+
+<file path="app.vue">
+<template>
+    <NuxtLayout>
+        <NuxtPage />
+    </NuxtLayout>
+</template>
+</file>
+
+<file path="nuxt.config.ts">
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  devtools: { enabled: false },
+  css: ["~/assets/css/main.css"],
+  plugins: ["~/plugins/apexcharts.js"],
+
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
+  ssr: true,
+  app: {
+    head: {
+      title: "AquaEyes - Flood Prediction System",
+      meta: [
+        {
+          name: "description",
+          content: "AquaEyes flood prediction system for Laos",
+        },
+      ],
+      link: [
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@100..900&display=swap",
+        },
+      ],
+    },
+    pageTransition: { name: "page", mode: "out-in" },
+  },
+
+  build: {
+    transpile: ["vue3-apexcharts"],
+  },
+
+  compatibilityDate: "2025-03-30",
+});
+</file>
+
+<file path="package.json">
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@heroicons/vue": "^2.2.0",
+    "apexcharts": "^4.5.0",
+    "chart.js": "^4.4.8",
+    "nuxt": "^3.16.1",
+    "vue": "^3.5.13",
+    "vue-chartjs": "^5.3.2",
+    "vue-router": "^4.5.0",
+    "vue3-apexcharts": "^1.8.0"
+  },
+  "packageManager": "yarn@4.7.0+sha512.5a0afa1d4c1d844b3447ee3319633797bcd6385d9a44be07993ae52ff4facabccafb4af5dcd1c2f9a94ac113e5e9ff56f6130431905884414229e284e37bb7c9",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "3"
+  }
+}
+</file>
+
+<file path="README.md">
+# Nuxt Minimal Starter
+
+Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+
+## Setup
+
+Make sure to install dependencies:
+
+```bash
+# npm
+npm install
+
+# pnpm
+pnpm install
+
+# yarn
+yarn install
+
+# bun
+bun install
+```
+
+## Development Server
+
+Start the development server on `http://localhost:3000`:
+
+```bash
+# npm
+npm run dev
+
+# pnpm
+pnpm dev
+
+# yarn
+yarn dev
+
+# bun
+bun run dev
+```
+
+## Production
+
+Build the application for production:
+
+```bash
+# npm
+npm run build
+
+# pnpm
+pnpm build
+
+# yarn
+yarn build
+
+# bun
+bun run build
+```
+
+Locally preview production build:
+
+```bash
+# npm
+npm run preview
+
+# pnpm
+pnpm preview
+
+# yarn
+yarn preview
+
+# bun
+bun run preview
+```
+
+Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+</file>
+
+<file path="tailwind.config.js">
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./components/**/*.{js,vue,ts}",
+    "./layouts/**/*.vue",
+    "./pages/**/*.vue",
+    "./plugins/**/*.{js,ts}",
+    "./app.vue",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // Colors extracted from your UI
+        "aqua-primary": "#1F7AC4",
+        "aqua-secondary": "#F8F9FA",
+        "aqua-critical": "#FF3B30",
+        "aqua-warning": "#FFCC00",
+        "aqua-info": "#1F7AC4",
+        "aqua-success": "#4CD964",
+        "aqua-text": "#333333",
+        "aqua-green": "#71E589", // Green text in your UI
+      },
+      fontFamily: {
+        sans: ["Noto Sans Lao Looped", "sans-serif"],
+      },
+    },
+  },
+  plugins: [],
+};
+</file>
+
+<file path="tsconfig.json">
+{
+  // https://nuxt.com/docs/guide/concepts/typescript
+  "extends": "./.nuxt/tsconfig.json"
+}
+</file>
+
+<file path="components/TheNavigation.vue">
+<!-- components/TheNavigation.vue -->
+<template>
+    <nav class="bg-white shadow-md">
+        <div class="px-4 sm:px-6">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <img
+                            class="h-8 w-auto"
+                            src="~/assets/images/aquaeyes-logo.png"
+                            alt="AquaEyes Logo"
+                        />
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <!-- Mobile menu button -->
+                    <button
+                        @click="isOpen = !isOpen"
+                        type="button"
+                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
+                        aria-expanded="false"
+                    >
+                        <span class="sr-only">Open main menu</span>
+                        <!-- Icon when menu is closed -->
+                        <svg
+                            v-if="!isOpen"
+                            class="block h-6 w-6"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            />
+                        </svg>
+                        <!-- Icon when menu is open -->
+                        <svg
+                            v-else
+                            class="block h-6 w-6"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu, show/hide based on menu state -->
+        <div
+            v-if="isOpen"
+            class="transition-all duration-300 transform origin-top"
+        >
+            <div class="pt-2 pb-3 space-y-1">
+                <!-- Mobile navigation links -->
+                <NuxtLink
+                    to="/"
+                    class="flex items-center px-4 py-2 text-base font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-500"
+                    active-class="bg-blue-500 text-white"
+                >
+                    <ChartBarIcon class="w-5 h-5 mr-3" />
+                    Dashboard
+                </NuxtLink>
+                <NuxtLink
+                    to="/history"
+                    class="flex items-center px-4 py-2 text-base font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-500"
+                    active-class="bg-blue-500 text-white"
+                >
+                    <ClockIcon class="w-5 h-5 mr-3" />
+                    History
+                </NuxtLink>
+                <NuxtLink
+                    to="/alerts"
+                    class="flex items-center px-4 py-2 text-base font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-500"
+                    active-class="bg-blue-500 text-white"
+                >
+                    <BellAlertIcon class="w-5 h-5 mr-3" />
+                    Alerts
+                </NuxtLink>
+            </div>
+        </div>
+    </nav>
+</template>
+
+<script setup>
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import {
+    ChartBarIcon,
+    ClockIcon,
+    BellAlertIcon,
+} from "@heroicons/vue/24/outline";
+
+const route = useRoute();
+const isOpen = ref(false);
+
+// Close mobile menu when route changes
+watch(
+    () => route.path,
+    (newPath) => {
+        isOpen.value = false;
+    },
+    { immediate: true },
+);
+</script>
+</file>
+
+<file path="components/charts/BarChart.client.vue">
+// barchart
+<template>
+  <div ref="chartContainer" class="min-h-[250px]"></div>
+</template>
+
+<script setup>
+import { ref, onMounted, computed, watch, onBeforeUnmount } from "vue";
+
+const props = defineProps({
+  chartData: {
+    type: Array,
+    required: true,
+  },
+  categories: {
+    type: Array,
+    required: true,
+  },
+  seriesName: {
+    type: String,
+    default: "Data",
+  },
+  yAxisTitle: {
+    type: String,
+    default: "",
+  },
+  yAxisUnit: {
+    type: String,
+    default: "",
+  },
+  color: {
+    type: String,
+    default: "#3B82F6", // Default blue color
+  },
+  columnWidth: {
+    type: String,
+    default: "50%",
+  },
+  height: {
+    type: Number,
+    default: 300,
+  },
+});
+
+const chartContainer = ref(null);
+let chart = null;
+
+// Series data for the chart
+const series = computed(() => [
+  {
+    name: props.seriesName,
+    data: props.chartData,
+  },
+]);
+
+// Chart options
+const chartOptions = computed(() => ({
+  chart: {
+    type: "bar",
+    fontFamily: "Noto Sans Lao, sans-serif",
+    toolbar: {
+      show: false,
+    },
+    animations: {
+      enabled: true,
+      easing: "easeinout",
+      speed: 800,
+    },
+    parentHeightOffset: 0,
+    redrawOnWindowResize: true,
+  },
+  annotations: {
+    yaxis: [
+      {
+        y: 150, // Threshold value for rainfall intensity
+        borderColor: "#F97316",
+        strokeDashArray: 4,
+        label: {
+          borderColor: "#F97316",
+          style: {
+            color: "#F97316",
+            fontSize: "10px",
+            fontWeight: "bold",
+          },
+          text: "ລະດັບເຝົ້າລະວັງ",
+        },
+      },
+    ],
+  },
+  plotOptions: {
+    bar: {
+      borderRadius: 0,
+      columnWidth: props.columnWidth,
+      dataLabels: {
+        position: "top",
+      },
+    },
+  },
+  colors: [props.color],
+  dataLabels: {
+    enabled: false,
+  },
+  xaxis: {
+    categories: props.categories,
+    position: "bottom",
+    labels: {
+      style: {
+        fontSize: "12px",
+      },
+    },
+    axisBorder: {
+      show: false,
+    },
+    axisTicks: {
+      show: false,
+    },
+  },
+  yaxis: {
+    title: {
+      text: props.yAxisTitle,
+      style: {
+        fontSize: "12px",
+      },
+    },
+    min: 0,
+    max: props.chartData?.length ? Math.max(...props.chartData) * 1.2 : 100, // 20% headroom above max value
+    tickAmount: 5,
+  },
+  grid: {
+    borderColor: "#e0e0e0",
+    strokeDashArray: 5,
+    xaxis: {
+      lines: {
+        show: true,
+      },
+    },
+    yaxis: {
+      lines: {
+        show: true,
+      },
+    },
+  },
+  tooltip: {
+    y: {
+      formatter: (value) => {
+        return `${value} ${props.yAxisUnit}`;
+      },
+    },
+  },
+  responsive: [
+    {
+      breakpoint: 768, // Tablet breakpoint
+      options: {
+        plotOptions: {
+          bar: {
+            columnWidth: "60%",
+          },
+        },
+        xaxis: {
+          labels: {
+            style: {
+              fontSize: "11px",
+            },
+          },
+        },
+        yaxis: {
+          title: {
+            text: props.yAxisTitle, // Keep the title text
+            style: {
+              fontSize: "10px",
+            },
+          },
+          labels: {
+            show: true, // Ensure labels are visible
+          },
+        },
+      },
+    },
+    {
+      breakpoint: 480, // Mobile breakpoint
+      options: {
+        plotOptions: {
+          bar: {
+            columnWidth: "70%",
+          },
+        },
+        xaxis: {
+          labels: {
+            rotate: -45,
+            rotateAlways: true,
+            style: {
+              fontSize: "10px",
+            },
+          },
+        },
+        yaxis: {
+          title: {
+            text: props.yAxisTitle, // Keep the title text
+            style: {
+              fontSize: "10px",
+            },
+          },
+          labels: {
+            show: true, // Ensure labels are visible
+          },
+        },
+      },
+    },
+  ],
+}));
+
+const handleResize = () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (chart) {
+      chart.update();
+    }
+  }, 250);
+};
+
+onMounted(async () => {
+  if (!chartContainer.value) return;
+
+  try {
+    const ApexCharts = (await import("apexcharts")).default;
+
+    if (chart) {
+      chart.destroy();
+    }
+
+    chart = new ApexCharts(chartContainer.value, {
+      ...chartOptions.value,
+      series: series.value,
+    });
+
+    await chart.render();
+    window.addEventListener("resize", handleResize);
+  } catch (error) {
+    console.error("Error initializing chart:", error);
+  }
+});
+
+// Add cleanup for resize listener
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", handleResize);
+  if (chart) {
+    chart.destroy();
+    chart = null;
+  }
+});
+
+// Update chart when data changes
+watch(
+  [
+    () => props.chartData,
+    () => props.categories,
+    () => props.height,
+    () => props.columnWidth,
+  ],
+  () => {
+    if (chart) {
+      chart.updateOptions({
+        ...chartOptions.value,
+      });
+      chart.updateSeries(series.value);
+    }
+  },
+  { deep: true }
+);
+</script>
+</file>
+
+<file path="layouts/default.vue">
+<!-- layouts/default.vue -->
+<template>
+    <div class="flex min-h-screen bg-gray-50">
+        <!-- Sidebar -->
+        <div
+            :class="[
+                'bg-white shadow-md z-30 hidden md:block',
+                'fixed md:relative min-h-screen',
+                'w-[180px] lg:w-[220px] xl:w-[240px] 2xl:w-[260px]',
+                mediumScreenCollapsed && 'w-16 lg:w-20',
+                'transform transition-all duration-200 ease-in-out',
+            ]"
+        >
+            <!-- <button
+                @click="toggleSidebar"
+                class="absolute right-0 top-16 -mr-3 bg-white rounded-full p-1 shadow-md border border-gray-200 hidden md:flex items-center justify-center"
+            >
+                <ChevronLeftIcon
+                    v-if="!mediumScreenCollapsed"
+                    class="w-4 h-4 text-gray-500"
+                />
+                <ChevronRightIcon v-else class="w-4 h-4 text-gray-500" />
+            </button> -->
+            <!-- Logo -->
+            <div class="p-3 lg:p-4 border-b flex items-center justify-center">
+                <div v-if="!mediumScreenCollapsed" class="flex items-center">
+                    <img
+                        src="~/assets/images/aquaeyes-logo.png"
+                        alt="AquaEyes"
+                        class="h-8 w-auto lg:h-10 lg:w-auto"
+                    />
+                </div>
+                <img
+                    v-else
+                    src="~/assets/images/aquaeyes-logo.png"
+                    alt="AquaEyes"
+                    class="h-6 w-auto lg:h-8 lg:w-auto"
+                />
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex-1 overflow-y-auto">
+                <nav class="p-2">
+                    <!-- Dashboard -->
+                    <NuxtLink
+                        to="/"
+                        active-class="bg-blue-500 text-white"
+                        class="flex items-center p-3 mb-2 rounded-lg transition-colors hover:bg-blue-100 text-gray-700"
+                        :class="{
+                            'justify-center': mediumScreenCollapsed,
+                            'justify-start': !mediumScreenCollapsed,
+                        }"
+                    >
+                        <ChartBarIcon class="w-6 h-6" />
+                        <span v-if="!mediumScreenCollapsed" class="ml-3"
+                            >Dashboard</span
+                        >
+                        <div
+                            v-if="mediumScreenCollapsed"
+                            class="absolute left-full ml-2 bg-gray-800 text-white text-xs rounded py-1 px-2 invisible group-hover:visible whitespace-nowrap z-50"
+                        >
+                            Dashboard
+                        </div>
+                    </NuxtLink>
+
+                    <!-- History -->
+                    <NuxtLink
+                        to="/history"
+                        active-class="bg-blue-500 text-white"
+                        class="flex items-center p-3 mb-2 rounded-lg transition-colors hover:bg-blue-100 text-gray-700"
+                        :class="{
+                            'justify-center': mediumScreenCollapsed,
+                            'justify-start': !mediumScreenCollapsed,
+                        }"
+                    >
+                        <ClockIcon class="w-6 h-6" />
+                        <span v-if="!mediumScreenCollapsed" class="ml-3"
+                            >ຂໍ້ມູນທີ່ຜ່ານມາ</span
+                        >
+                        <div
+                            v-if="mediumScreenCollapsed"
+                            class="absolute left-full ml-2 bg-gray-800 text-white text-xs rounded py-1 px-2 invisible group-hover:visible whitespace-nowrap z-50"
+                        >
+                            Dashboard
+                        </div>
+                    </NuxtLink>
+
+                    <!-- Alerts -->
+                    <NuxtLink
+                        to="/alerts"
+                        active-class="bg-blue-500 text-white"
+                        class="flex items-center p-3 mb-2 rounded-lg transition-colors hover:bg-blue-100 text-gray-700"
+                        :class="{
+                            'justify-center': mediumScreenCollapsed,
+                            'justify-start': !mediumScreenCollapsed,
+                        }"
+                    >
+                        <BellAlertIcon class="w-6 h-6" />
+                        <span v-if="!mediumScreenCollapsed" class="ml-3"
+                            >ປະຫວັດການແຈ້ງເຕືອນ</span
+                        >
+                        <div
+                            v-if="mediumScreenCollapsed"
+                            class="absolute left-full ml-2 bg-gray-800 text-white text-xs rounded py-1 px-2 invisible group-hover:visible whitespace-nowrap z-50"
+                        >
+                            Dashboard
+                        </div>
+                    </NuxtLink>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Mobile and Main Content container -->
+        <div class="flex-1 flex flex-col">
+            <!-- Mobile Navigation -->
+
+            <TheNavigation
+                class="md:hidden sticky top-0 z-40 bg-white shadow-sm"
+            />
+
+            <!-- Main Content -->
+
+            <main
+                class="flex-1 flex flex-col max-w-screen-2xl mx-auto"
+            >
+                <slot class="" />
+            </main>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import TheNavigation from "~/components/TheNavigation.vue";
+import {
+    ChartBarIcon,
+    ClockIcon,
+    BellAlertIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+} from "@heroicons/vue/24/outline";
+
+// For medium screen collapse (expanded by default on desktop)
+const mediumScreenCollapsed = ref(false);
+
+// Optionally add toggle button for sidebar collapse
+const toggleSidebar = () => {
+    mediumScreenCollapsed.value = !mediumScreenCollapsed.value;
+};
+
+const handleResize = () => {
+    if (window.innerWidth < 1024 && window.innerWidth >= 768) {
+        mediumScreenCollapsed.value = true;
+    } else if (window.innerWidth >= 1024) {
+        mediumScreenCollapsed.value = false;
+    }
+};
+
+onMounted(() => {
+    // Initial check
+    handleResize();
+
+    // Add resize listener
+    window.addEventListener("resize", handleResize);
+});
+
+onBeforeUnmount(() => {
+    // Clean up
+    window.removeEventListener("resize", handleResize);
+});
+</script>
+</file>
+
+<file path="pages/alerts/[alertId]/index.vue">
+<!-- pages/alerts/[alertId]/index.vue -->
+<template>
+    <div class="p-4 md:p-6 lg:p-8 space-y-6 bg-gray-50 min-h-screen">
+        <!-- Back button and page header -->
+        <div
+            class="flex justify-between items-center mb-3 md:mb-4 bg-white p-2 md:p-3 rounded-lg shadow"
+        >
+            <div class="flex items-center space-x-3">
+                <button
+                    @click="router.back()"
+                    class="p-2 hover:bg-gray-100 rounded-full transition-colors duration-150"
+                >
+                    <ArrowLeftIcon class="w-5 h-5 text-gray-600" />
+                </button>
+                <h1 class="text-xl md:text-2xl font-bold">
+                    ລາຍລະອຽດການແຈ້ງເຕືອນ
+                </h1>
+            </div>
+            <div class="flex items-center space-x-2">
+                <StatusBadge :status="alert.status" />
+            </div>
+        </div>
+
+        <!-- Main content wrapper -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Alert information section -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Alert card -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div
+                        class="p-4 border-l-4"
+                        :class="{
+                            'border-blue-500 bg-blue-50':
+                                alert.severity === 'info',
+                            'border-yellow-500 bg-yellow-50':
+                                alert.severity === 'warning',
+                            'border-orange-500 bg-orange-50':
+                                alert.severity === 'danger',
+                            'border-red-500 bg-red-50':
+                                alert.severity === 'critical',
+                        }"
+                    >
+                        <div class="flex items-start space-x-3">
+                            <div
+                                class="p-2 rounded-full"
+                                :class="{
+                                    'text-blue-600 bg-blue-100':
+                                        alert.severity === 'info',
+                                    'text-yellow-600 bg-yellow-100':
+                                        alert.severity === 'warning',
+                                    'text-orange-600 bg-orange-100':
+                                        alert.severity === 'danger',
+                                    'text-red-600 bg-red-100':
+                                        alert.severity === 'critical',
+                                }"
+                            >
+                                <InformationCircleIcon
+                                    v-if="alert.severity === 'info'"
+                                    class="w-6 h-6"
+                                />
+                                <ExclamationTriangleIcon
+                                    v-if="alert.severity === 'warning'"
+                                    class="w-6 h-6"
+                                />
+                                <ExclamationTriangleIcon
+                                    v-if="alert.severity === 'danger'"
+                                    class="w-6 h-6"
+                                />
+                                <ExclamationCircleIcon
+                                    v-if="alert.severity === 'critical'"
+                                    class="w-6 h-6"
+                                />
+                            </div>
+
+                            <div class="flex-1">
+                                <h2 class="text-lg font-bold mb-1">
+                                    {{ formatAlertType(alert.type) }}
+                                </h2>
+                                <p class="text-base">{{ alert.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alert details -->
+                    <div class="p-4">
+                        <h3 class="font-medium text-gray-700 text-base mb-4">
+                            ຂໍ້ມູນລາຍລະອຽດ
+                        </h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500">
+                                    ID ການແຈ້ງເຕືອນ
+                                </p>
+                                <p class="font-medium">{{ alert.alert_id }}</p>
+                            </div>
+
+                            <div>
+                                <p class="text-sm text-gray-500">ຄວາມຮຸນແຮງ</p>
+                                <SeverityBadge
+                                    :severity="alert.severity"
+                                    class="mt-1"
+                                />
+                            </div>
+
+                            <div>
+                                <p class="text-sm text-gray-500">ສ້າງເມື່ອ</p>
+                                <p class="font-medium">
+                                    {{ formatDate(alert.created_at) }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-sm text-gray-500">ສະຖານະ</p>
+                                <StatusBadge
+                                    :status="alert.status"
+                                    class="mt-1"
+                                />
+                            </div>
+
+                            <div v-if="alert.location && alert.location.name">
+                                <p class="text-sm text-gray-500">ສະຖານທີ່</p>
+                                <p class="font-medium">
+                                    {{ alert.location.name }}
+                                </p>
+                            </div>
+
+                            <div
+                                v-if="
+                                    alert.recipients && alert.recipients.length
+                                "
+                            >
+                                <p class="text-sm text-gray-500">ຈຳນວນຜູ້ຮັບ</p>
+                                <p class="font-medium">
+                                    {{ alert.recipients.length }} ຄົນ
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trigger information -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="border-b border-gray-200 p-4">
+                        <h3 class="font-medium text-gray-800">
+                            ຂໍ້ມູນທີ່ກະຕຸ້ນການແຈ້ງເຕືອນ
+                        </h3>
+                    </div>
+                    <div class="p-4">
+                        <div
+                            v-if="
+                                alert.triggered_by &&
+                                alert.triggered_by.condition
+                            "
+                            class="space-y-4"
+                        >
+                            <!-- Sensor trigger data -->
+                            <div
+                                v-if="
+                                    alert.type === 'flood_warning' ||
+                                    alert.type === 'sensor_failure'
+                                "
+                            >
+                                <div
+                                    class="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                                >
+                                    <div>
+                                        <p class="text-sm text-gray-500">
+                                            ເງື່ອນໄຂ
+                                        </p>
+                                        <p class="font-medium">
+                                            {{ alert.triggered_by.condition }}
+                                        </p>
+                                    </div>
+
+                                    <div
+                                        v-if="
+                                            alert.triggered_by.threshold !==
+                                            undefined
+                                        "
+                                    >
+                                        <p class="text-sm text-gray-500">
+                                            ຄ່າ Threshold
+                                        </p>
+                                        <p class="font-medium">
+                                            {{ alert.triggered_by.threshold }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Readings visualization if available -->
+                                <div
+                                    v-if="alert.triggered_by.readings"
+                                    class="mt-4"
+                                >
+                                    <p class="text-sm text-gray-500 mb-2">
+                                        ຄ່າທີ່ອ່ານໄດ້
+                                    </p>
+                                    <div
+                                        class="h-48 bg-gray-50 border border-gray-200 rounded-lg p-2"
+                                    >
+                                        <!-- Placeholder for chart or visualization -->
+                                        <div
+                                            class="flex items-center justify-center h-full text-center text-gray-400"
+                                        >
+                                            <p>
+                                                ກຣາຟສະແດງຄ່າທີ່ອ່ານໄດ້ຈະປາກົດຢູ່ບ່ອນນີ້
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Prediction trigger data -->
+                            <div
+                                v-if="
+                                    alert.type === 'flood_warning' &&
+                                    alert.triggered_by.prediction_id
+                                "
+                            >
+                                <div
+                                    class="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                                >
+                                    <div>
+                                        <p class="text-sm text-gray-500">
+                                            ID ການທຳນາຍ
+                                        </p>
+                                        <p class="font-medium">
+                                            {{
+                                                alert.triggered_by.prediction_id
+                                            }}
+                                        </p>
+                                    </div>
+
+                                    <div
+                                        v-if="
+                                            alert.triggered_by.confidence !==
+                                            undefined
+                                        "
+                                    >
+                                        <p class="text-sm text-gray-500">
+                                            ຄວາມໜ້າເຊື່ອຖື
+                                        </p>
+                                        <p class="font-medium">
+                                            {{
+                                                (
+                                                    alert.triggered_by
+                                                        .confidence * 100
+                                                ).toFixed(1)
+                                            }}%
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Battery or connection data -->
+                            <div
+                                v-if="
+                                    alert.type === 'battery_low' ||
+                                    alert.type === 'connection_loss'
+                                "
+                            >
+                                <div
+                                    class="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                                >
+                                    <div
+                                        v-if="
+                                            alert.type === 'battery_low' &&
+                                            alert.triggered_by.level !==
+                                                undefined
+                                        "
+                                    >
+                                        <p class="text-sm text-gray-500">
+                                            ລະດັບແບັດເຕີຣີ
+                                        </p>
+                                        <div class="mt-1 flex items-center">
+                                            <div
+                                                class="relative w-full h-2 bg-gray-200 rounded-full"
+                                            >
+                                                <div
+                                                    class="absolute top-0 left-0 h-full bg-red-500 rounded-full"
+                                                    :style="`width: ${alert.triggered_by.level}%`"
+                                                ></div>
+                                            </div>
+                                            <span
+                                                class="ml-2 text-sm font-medium"
+                                                >{{
+                                                    alert.triggered_by.level
+                                                }}%</span
+                                            >
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        v-if="
+                                            alert.type === 'connection_loss' &&
+                                            alert.triggered_by.last_seen
+                                        "
+                                    >
+                                        <p class="text-sm text-gray-500">
+                                            ເຫັນລ່າສຸດ
+                                        </p>
+                                        <p class="font-medium">
+                                            {{
+                                                formatDate(
+                                                    alert.triggered_by
+                                                        .last_seen,
+                                                )
+                                            }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- No trigger data available -->
+                        <p v-else class="text-gray-500">
+                            ບໍ່ມີຂໍ້ມູນກ່ຽວກັບສິ່ງທີ່ກະຕຸ້ນການແຈ້ງເຕືອນນີ້
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar with action items and related info -->
+            <div class="space-y-6">
+                <!-- Action buttons -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="border-b border-gray-200 p-4">
+                        <h3 class="font-medium text-gray-800">ການດຳເນີນການ</h3>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <button
+                            v-if="alert.status === 'pending'"
+                            class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            ສົ່ງການແຈ້ງເຕືອນ
+                        </button>
+
+                        <button
+                            class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            ສົ່ງຕໍ່ການແຈ້ງເຕືອນ
+                        </button>
+
+                        <button
+                            class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            ຕັ້ງຄ່າເປັນອ່ານແລ້ວ
+                        </button>
+
+                        <button
+                            class="w-full flex justify-center items-center px-4 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                        >
+                            <TrashIcon class="h-4 w-4 mr-2" />
+                            ລຶບການແຈ້ງເຕືອນນີ້
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Affected devices -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="border-b border-gray-200 p-4">
+                        <h3 class="font-medium text-gray-800">
+                            ອຸປະກອນທີ່ໄດ້ຮັບຜົນກະທົບ
+                        </h3>
+                    </div>
+                    <div class="p-4">
+                        <div
+                            v-if="alert.devices && alert.devices.length > 0"
+                            class="space-y-3"
+                        >
+                            <div
+                                v-for="(device, index) in alert.devices"
+                                :key="index"
+                                class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md"
+                            >
+                                <div class="flex items-center space-x-3">
+                                    <DeviceIcon class="h-5 w-5 text-gray-500" />
+                                    <span>{{ device }}</span>
+                                </div>
+                                <button
+                                    class="text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                    ເບິ່ງ
+                                </button>
+                            </div>
+                        </div>
+                        <p v-else class="text-gray-500">
+                            ບໍ່ມີອຸປະກອນທີ່ໄດ້ຮັບຜົນກະທົບກັບການແຈ້ງເຕືອນນີ້
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Location map -->
+                <div
+                    v-if="alert.location && alert.location.coordinates"
+                    class="bg-white rounded-lg shadow overflow-hidden"
+                >
+                    <div class="border-b border-gray-200 p-4">
+                        <h3 class="font-medium text-gray-800">ແຜນທີ່</h3>
+                    </div>
+                    <div
+                        class="p-4 h-64 bg-gray-100 flex items-center justify-center text-gray-400"
+                    >
+                        <!-- Placeholder for map -->
+                        <p>ແຜນທີ່ສະຖານທີ່ຈະປາກົດຢູ່ບ່ອນນີ້</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import {
+    ArrowLeftIcon,
+    ExclamationCircleIcon,
+    ExclamationTriangleIcon,
+    InformationCircleIcon,
+    TrashIcon,
+} from "@heroicons/vue/24/outline";
+import SeverityBadge from "~/components/badges/SeverityBadge.vue";
+import StatusBadge from "~/components/badges/StatusBadge.vue";
+import DeviceIcon from "~/components/icons/DeviceIcon.vue";
+
+const route = useRoute();
+const router = useRouter();
+const alert = ref({
+    alert_id: "",
+    type: "",
+    severity: "",
+    message: "",
+    devices: [],
+    location: {},
+    triggered_by: {},
+    recipients: [],
+    status: "",
+    created_at: "",
+    updated_at: "",
+});
+
+// Format functions
+const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleString("lo-LA", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+};
+
+const formatAlertType = (type) => {
+    switch (type) {
+        case "flood_warning":
+            return "ເຕືອນໄພນ້ຳຖ້ວມ";
+        case "sensor_failure":
+            return "ເຊັນເຊີເສຍຫາຍ";
+        case "battery_low":
+            return "ແບັດເຕີຣີຕ່ຳ";
+        case "connection_loss":
+            return "ການເຊື່ອມຕໍ່ຂາດ";
+        case "other":
+            return "ອື່ນໆ";
+        default:
+            return type;
+    }
+};
+
+// Fetch alert data based on route params
+onMounted(async () => {
+    const alertId = route.params.alertId;
+
+    try {
+        // In a real app, you would fetch from API
+        // const { data } = await useFetch(`/api/alerts/${alertId}`);
+        // alert.value = data.value;
+
+        // For demo, we're using mock data
+        alert.value = {
+            alert_id: `ALT- + ${alertId}`,
+            type: "flood_warning",
+            severity: "critical",
+            message:
+                "ສະຖານີ 1 | ລະດັບນ້ຳຂີດຕລະບຸ: 14ມ (Warn: 13ມ) | ເວລາເຂົ້າເຖິງອີກ: 1 ຊົ່ວໂມງ",
+            devices: ["DEV-001", "DEV-002"],
+            location: {
+                name: "ບ້ານ ນາຫລວງ, ເມືອງປາກຊັນ",
+                coordinates: [102.6123, 18.3893],
+            },
+            triggered_by: {
+                condition: "ລະດັບນ້ຳເກີນຄ່າທີ່ກໍານົດໄວ້",
+                readings: [12.5, 13.2, 13.8, 14.2],
+                threshold: 13,
+            },
+            recipients: [
+                "village-head@example.com",
+                "district-admin@example.com",
+            ],
+            status: "sent",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        };
+    } catch (error) {
+        console.error("Error fetching alert:", error);
+    }
+});
+</script>
+</file>
+
+<file path="pages/alerts/index.vue">
+<!-- pages/alerts.vue -->
+<template>
+    <div class="p-4 md:p-6 lg:p-8 space-y-6 bg-gray-50 min-h-screen">
+        <!-- Page Header -->
+        <div
+            class="flex justify-between items-center mb-3 md:mb-4 bg-white p-2 md:p-3 rounded-lg shadow"
+        >
+            <h1 class="text-xl md:text-2xl font-bold">ປະຫວັດການແຈ້ງເຕືອນ</h1>
+            <div class="flex items-center">
+                <button class="p-1 text-gray-700">
+                    <BellIcon class="w-6 h-6" />
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="bg-white rounded-lg shadow p-3 mb-4">
+            <h2 class="font-bold text-lg md:text-xl mb-2 md:mb-3">ຕົວເລືອກ</h2>
+            <div
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end"
+            >
+                <!-- Alert Type Filter -->
+                <div>
+                    <label
+                        for="alertType"
+                        class="block text-sm font-medium text-gray-600 mb-1"
+                        >ປະເພດການເຕືອນ</label
+                    >
+                    <select
+                        id="alertType"
+                        v-model="filters.type"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    >
+                        <option value="">ທັງໝົດ</option>
+                        <option value="critical">Critical</option>
+                        <option value="warning">Warning</option>
+                        <option value="info">Info</option>
+                    </select>
+                </div>
+
+                <!-- Date Filter -->
+                <div>
+                    <label
+                        for="dateFilter"
+                        class="block text-sm font-medium text-gray-600 mb-1"
+                        >ເວລາ</label
+                    >
+                    <select
+                        id="dateFilter"
+                        v-model="filters.dateRange"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    >
+                        <option value="all">ທັງໝົດ</option>
+                        <option value="today">ມື້ນີ້</option>
+                        <option value="yesterday">ມື້ວານນີ້</option>
+                        <option value="week">ອາທິດນີ້</option>
+                        <option value="month">ເດືອນນີ້</option>
+                    </select>
+                </div>
+
+                <!-- Filter Button -->
+                <div class="sm:col-span-2 lg:col-span-4 pt-2">
+                    <button
+                        @click="applyFilters"
+                        :disabled="loading"
+                        class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <svg
+                            v-if="loading"
+                            class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                class="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"
+                            ></circle>
+                            <path
+                                class="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                        </svg>
+                        {{ loading ? "ກຳລັງໂຫຼດ..." : "ດຶງຂໍ້ມູນ" }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Mode Toggle -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <!-- Toggle for different display modes -->
+            <div
+                class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-end"
+            >
+                <div class="flex space-x-2">
+                    <button
+                        @click="viewMode = 'list'"
+                        :class="[
+                            'px-3 py-1 text-sm font-medium rounded',
+                            viewMode === 'list'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                        ]"
+                    >
+                        ຮູບແບບລາຍການ
+                    </button>
+                    <button
+                        @click="viewMode = 'card'"
+                        :class="[
+                            'px-3 py-1 text-sm font-medium rounded',
+                            viewMode === 'card'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                        ]"
+                    >
+                        ຮູບແບບບັດ
+                    </button>
+                </div>
+            </div>
+
+            <!-- List View -->
+            <div v-if="viewMode === 'list'" class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                ປະເພດ
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                ເວລາ
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                ຂໍ້ຄວາມ
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                ການດໍາເນີນການ
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-if="loading && paginatedAlerts.length === 0">
+                            <td
+                                colspan="4"
+                                class="px-4 py-4 text-center text-gray-500"
+                            >
+                                <div class="flex justify-center items-center">
+                                    <svg
+                                        class="animate-spin h-8 w-8 text-blue-600"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            class="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="4"
+                                        ></circle>
+                                        <path
+                                            class="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr
+                            v-else-if="!loading && paginatedAlerts.length === 0"
+                        >
+                            <td
+                                colspan="4"
+                                class="px-4 py-4 text-center text-gray-500"
+                            >
+                                ບໍ່ມີຂໍ້ມູນສຳລັບຕົວກອງທີ່ເລືອກ.
+                            </td>
+                        </tr>
+                        <tr
+                            v-else
+                            v-for="alert in paginatedAlerts"
+                            :key="alert.id"
+                            class="hover:bg-gray-50 transition-colors duration-150"
+                            @click="showAlertDetails(alert)"
+                        >
+                            <td class="px-4 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div
+                                        :class="[
+                                            'flex-shrink-0 p-1 rounded-full',
+                                            alert.type === 'critical'
+                                                ? 'text-red-500'
+                                                : alert.type === 'warning'
+                                                  ? 'text-yellow-500'
+                                                  : 'text-blue-500',
+                                        ]"
+                                    >
+                                        <ExclamationCircleIcon
+                                            v-if="alert.type === 'critical'"
+                                            class="w-5 h-5"
+                                        />
+                                        <ExclamationTriangleIcon
+                                            v-if="alert.type === 'warning'"
+                                            class="w-5 h-5"
+                                        />
+                                        <InformationCircleIcon
+                                            v-if="alert.type === 'info'"
+                                            class="w-5 h-5"
+                                        />
+                                    </div>
+                                    <span
+                                        class="ml-2 font-semibold capitalize"
+                                        >{{ alert.type }}</span
+                                    >
+                                </div>
+                            </td>
+                            <td
+                                class="px-4 py-4 whitespace-nowrap text-sm text-gray-500"
+                            >
+                                {{ alert.time }}
+                            </td>
+                            <td class="px-4 py-4 text-sm text-gray-700">
+                                {{ alert.message }}
+                            </td>
+                            <td
+                                class="px-4 py-4 whitespace-nowrap text-sm text-gray-500"
+                            >
+                                <button
+                                    class="text-blue-600 hover:text-blue-800"
+                                    @click.stop="showAlertDetails(alert)"
+                                >
+                                    ລາຍລະອຽດ
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Card View -->
+            <div
+                v-else-if="viewMode === 'card'"
+                class="divide-y divide-gray-200"
+            >
+                <div
+                    v-if="loading && paginatedAlerts.length === 0"
+                    class="p-8 text-center"
+                >
+                    <svg
+                        class="animate-spin h-8 w-8 text-blue-600 mx-auto"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        ></circle>
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                    </svg>
+                </div>
+                <div
+                    v-else-if="!loading && paginatedAlerts.length === 0"
+                    class="p-8 text-center text-gray-500"
+                >
+                    ບໍ່ມີຂໍ້ມູນສຳລັບຕົວກອງທີ່ເລືອກ.
+                </div>
+                <AlertCard
+                    v-else
+                    v-for="alert in paginatedAlerts"
+                    :key="alert.id"
+                    :alert="alert"
+                    @click="showAlertDetails(alert)"
+                />
+            </div>
+
+            <!-- Improved Pagination Controls -->
+            <div
+                v-if="!loading && totalPages > 1"
+                class="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
+            >
+                <!-- Mobile Pagination -->
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <button
+                        @click="prevPage"
+                        :disabled="currentPage === 1"
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        ກັບຄືນ
+                    </button>
+                    <span class="text-sm text-gray-700">
+                        {{ currentPage }} / {{ totalPages }}
+                    </span>
+                    <button
+                        @click="nextPage"
+                        :disabled="currentPage === totalPages"
+                        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        ຕໍ່ໄປ
+                    </button>
+                </div>
+
+                <!-- Desktop Pagination -->
+                <div
+                    class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between"
+                >
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            ສະແດງ
+                            <span class="font-medium">{{
+                                (currentPage - 1) * itemsPerPage + 1
+                            }}</span>
+                            ຫາ
+                            <span class="font-medium">{{
+                                Math.min(currentPage * itemsPerPage, totalItems)
+                            }}</span>
+                            ຈາກທັງໝົດ
+                            <span class="font-medium">{{ totalItems }}</span>
+                            ລາຍການ
+                        </p>
+                    </div>
+                    <div>
+                        <nav
+                            class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                            aria-label="Pagination"
+                        >
+                            <button
+                                @click="prevPage"
+                                :disabled="currentPage === 1"
+                                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span class="sr-only">Previous</span>
+                                <ChevronLeftIcon class="h-5 w-5" />
+                            </button>
+
+                            <template
+                                v-for="page in paginationRange"
+                                :key="page"
+                            >
+                                <button
+                                    v-if="typeof page === 'number'"
+                                    @click="goToPage(page)"
+                                    :class="[
+                                        'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium',
+                                        currentPage === page
+                                            ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                                            : 'text-gray-700 hover:bg-gray-50',
+                                    ]"
+                                >
+                                    {{ page }}
+                                </button>
+                                <span
+                                    v-else
+                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                                >
+                                    ...
+                                </span>
+                            </template>
+
+                            <button
+                                @click="nextPage"
+                                :disabled="currentPage === totalPages"
+                                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span class="sr-only">Next</span>
+                                <ChevronRightIcon class="h-5 w-5" />
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div
+            v-if="error"
+            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+            role="alert"
+        >
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">{{ error }}</span>
+        </div>
+
+        <!-- Alert Modals -->
+        <AlertModal
+            v-if="showModal"
+            :type="activeModal.type"
+            :title="activeModal.title"
+            :message="activeModal.message"
+            @close="showModal = false"
+            @dismiss="handleDismiss"
+            @confirm="handleConfirm"
+        />
+    </div>
+</template>
+
+<script setup>
+import { ref, reactive, computed, onMounted } from "vue";
+import {
+    BellIcon,
+    ExclamationCircleIcon,
+    ExclamationTriangleIcon,
+    InformationCircleIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+} from "@heroicons/vue/24/outline";
+import AlertCard from "~/components/cards/AlertCard.vue";
+import AlertModal from "~/components/modals/AlertModal.vue";
+
+// Reactive State
+const loading = ref(false);
+const error = ref(null);
+const showModal = ref(false);
+const viewMode = ref("list"); // 'list' or 'card'
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+
+const route = useRoute();
+const router = useRouter();
+
+// Filters
+const filters = reactive({
+    type: "",
+    dateRange: "all",
+});
+
+// Modal state
+const activeModal = ref({
+    type: "critical",
+    title: "Critical",
+    message:
+        "ສະຖານີ 1 | ລະດັບນ້ຳຂີດຕລະບຸ: 14ມ (ຄວາມຮຸນແຮງອາກາດ: 13ມ) | ເວລາເຂົ້າເຖິງອີກ: 1 ຊົ່ວໂມງ",
+});
+
+// Raw alert data
+const rawAlerts = ref([
+    {
+        type: "critical",
+        time: "1 hour ago",
+        message:
+            "ສະຖານີ 1 | ລະດັບນ້ຳຂີດຕລະບຸ: 14ມ (Warn: 13ມ) | ເວລາເຂົ້າເຖິງອີກ: 1 ຊົ່ວໂມງ",
+        id: 1,
+    },
+    {
+        type: "warning",
+        time: "1 hour ago",
+        message: "ສະຖານີ 1 | 10ມ (Warn: 13ມ) ↑ 30ຊມ/ຊົ່ວໂມງ",
+        id: 2,
+    },
+    {
+        type: "critical",
+        time: "1 hour ago",
+        message:
+            "ສະຖານີ 1 | ລະດັບນ້ຳຂີດຕລະບຸ: 14ມ (Warn: 13ມ) | ເວລາເຂົ້າເຖິງອີກ: 1 ຊົ່ວໂມງ",
+        id: 3,
+    },
+    {
+        type: "info",
+        time: "1 hour ago",
+        message: "Sensor | ສະຖານີ 1 | Battery: 100% | ຄວາມແຮງຂອງສັນຍານ: X",
+        id: 4,
+    },
+    {
+        type: "warning",
+        time: "1 hour ago",
+        message: "ສະຖານີ 1 | 10ມ (Warn: 13ມ) ↑ 30ຊມ/ຊົ່ວໂມງ",
+        id: 5,
+    },
+    {
+        type: "info",
+        time: "2 hours ago",
+        message: "Sensor | ສະຖານີ 2 | Battery: 85% | ຄວາມແຮງຂອງສັນຍານ: XX",
+        id: 6,
+    },
+    {
+        type: "critical",
+        time: "3 hours ago",
+        message:
+            "ສະຖານີ 2 | ລະດັບນ້ຳຂີດຕລະບຸ: 12ມ (Warn: 10ມ) | ເວລາເຂົ້າເຖິງອີກ: 2 ຊົ່ວໂມງ",
+        id: 7,
+    },
+    {
+        type: "warning",
+        time: "4 hours ago",
+        message: "ສະຖານີ 3 | 8ມ (Warn: 9ມ) ↑ 25ຊມ/ຊົ່ວໂມງ",
+        id: 8,
+    },
+    {
+        type: "info",
+        time: "5 hours ago",
+        message: "Sensor | ສະຖານີ 3 | Battery: 90% | ຄວາມແຮງຂອງສັນຍານ: XXX",
+        id: 9,
+    },
+    {
+        type: "warning",
+        time: "6 hours ago",
+        message: "ສະຖານີ 2 | 7ມ (Warn: 10ມ) ↑ 20ຊມ/ຊົ່ວໂມງ",
+        id: 10,
+    },
+    {
+        type: "critical",
+        time: "7 hours ago",
+        message:
+            "ສະຖານີ 3 | ລະດັບນ້ຳຂີດຕລະບຸ: 11ມ (Warn: 9ມ) | ເວລາເຂົ້າເຖິງອີກ: 3 ຊົ່ວໂມງ",
+        id: 11,
+    },
+    {
+        type: "info",
+        time: "8 hours ago",
+        message: "Sensor | ສະຖານີ 1 | Battery: 75% | ຄວາມແຮງຂອງສັນຍານ: XX",
+        id: 12,
+    },
+]);
+
+// Filtered alerts based on filters
+const filteredAlerts = computed(() => {
+    return rawAlerts.value.filter((alert) => {
+        // Filter by type
+        if (filters.type && alert.type !== filters.type) {
+            return false;
+        }
+
+        // Filter by date range (simplified for demo)
+        if (filters.dateRange !== "all") {
+            // Implement date filtering logic here
+            // For this example, we'll just include all alerts
+            return true;
+        }
+
+        return true;
+    });
+});
+
+// Computed Properties
+const totalItems = computed(() => filteredAlerts.value.length);
+const totalPages = computed(() =>
+    Math.ceil(totalItems.value / itemsPerPage.value),
+);
+
+// Paginated alerts for current page
+const paginatedAlerts = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return filteredAlerts.value.slice(start, end);
+});
+
+// Enhanced pagination display logic
+const paginationRange = computed(() => {
+    const current = currentPage.value;
+    const last = totalPages.value;
+    const delta = 1; // How many pages to show around the current page
+    const left = current - delta;
+    const right = current + delta + 1;
+    const range = [];
+    const rangeWithDots = [];
+    let l = null;
+
+    for (let i = 1; i <= last; i++) {
+        if (i === 1 || i === last || (i >= left && i < right)) {
+            range.push(i);
+        }
+    }
+
+    for (const i of range) {
+        if (l !== null) {
+            if (i - l === 2) {
+                rangeWithDots.push(l + 1);
+            } else if (i - l > 2) {
+                rangeWithDots.push("..."); // Represents skipped pages
+            }
+        }
+        rangeWithDots.push(i);
+        l = i;
+    }
+
+    return rangeWithDots;
+});
+
+// Pagination Methods
+const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+    }
+};
+
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+        currentPage.value++;
+    }
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+    }
+};
+
+// Filter application
+const applyFilters = () => {
+    loading.value = true;
+    currentPage.value = 1; // Reset to first page when applying filters
+
+    // Simulate API delay
+    setTimeout(() => {
+        loading.value = false;
+    }, 500);
+};
+
+// Modal functions
+const showAlertDetails = (alert) => {
+    router.push(`/alerts/${alert.id}`);
+    // activeModal.value = {
+    //     type: alert.type,
+    //     title: alert.type.charAt(0).toUpperCase() + alert.type.slice(1),
+    //     message: alert.message,
+    // };
+    // showModal.value = true;
+};
+
+const handleDismiss = () => {
+    showModal.value = false;
+    // Add logic to dismiss alert
+    console.log("Alert dismissed");
+};
+
+const handleConfirm = () => {
+    showModal.value = false;
+    // Add logic to confirm alert
+    console.log("Alert confirmed");
+};
+
+// Set initial view mode based on screen size
+const setInitialViewMode = () => {
+    // Set card view by default on smaller screens
+    if (window.innerWidth < 640) {
+        // 640px is Tailwind's 'sm' breakpoint
+        viewMode.value = "card";
+    }
+};
+
+// Lifecycle hooks
+onMounted(() => {
+    setInitialViewMode(); // Set appropriate view mode based on screen size
+
+    // Optional: Add window resize listener to switch views automatically
+    window.addEventListener("resize", () => {
+        if (window.innerWidth < 640 && viewMode.value === "list") {
+            viewMode.value = "card";
+        }
+    });
+
+    // Fetch initial data
+    applyFilters();
+});
+</script>
+
+<style scoped>
+/* Base styles */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Improve tap target sizes on mobile */
+@media (max-width: 640px) {
+    button {
+        min-height: 44px;
+    }
+
+    input,
+    select {
+        min-height: 44px;
+    }
+
+    .pagination-button {
+        min-width: 44px;
+    }
+}
+
+/* Add smooth transitions for view mode changes */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+/* Optional loading animation styles */
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+</style>
+</file>
+
+<file path="components/charts/LineChart.client.vue">
+//line chart
+<template>
+    <div ref="chartContainer" class="w-full min-h-[250px]"></div>
+</template>
+
+<script setup>
+import { ref, onMounted, computed, watch, onBeforeUnmount } from "vue";
+
+const props = defineProps({
+    currentLevels: {
+        type: Array,
+        default: () => [],
+    },
+    predictedLevels: {
+        type: Array,
+        default: () => [],
+    },
+    bankHeight: {
+        type: Number,
+        default: 14,
+    },
+    labels: {
+        type: Array,
+        default: () => [
+            "ຈັນ",
+            "ອັງຄານ",
+            "ພຸດ",
+            "ພະຫັດ",
+            "ສຸກ",
+            "ເສົາ",
+            "ອາທິດ",
+        ],
+    },
+    height: {
+        type: [Number, String],
+        default: "100%",
+    },
+});
+
+const chartContainer = ref(null);
+let chart = null;
+let resizeTimeout = null;
+
+// Series data for the chart
+const series = computed(() => [
+    {
+        name: "ລະດັບນ້ຳ",
+        data: props.currentLevels,
+    },
+    {
+        name: "ລະດັບນ້ຳທີ່ຄາດຄະເນ",
+        data: props.predictedLevels,
+    },
+]);
+
+// Chart options
+const chartOptions = computed(() => ({
+    chart: {
+        type: "line",
+        fontFamily: "Noto Sans Lao, sans-serif",
+        height: "100%",
+        toolbar: {
+            show: true,
+            tools: {
+                download: true,
+                selection: false,
+                zoom: false,
+                zoomin: false,
+                zoomout: false,
+                pan: false,
+                reset: false,
+            },
+        },
+        animations: {
+            enabled: false,
+            easing: "easeinout",
+            speed: 800,
+        },
+        zoom: {
+            enabled: false,
+        },
+        parentHeightOffset: 0,
+        redrawOnWindowResize: true,
+    },
+    colors: ["#3B82F6", "#F97316"], // Blue for current, Orange for predicted
+    stroke: {
+        curve: "smooth",
+        width: 2,
+    },
+    markers: {
+        size: 4,
+        hover: {
+            size: 7,
+        },
+    },
+    xaxis: {
+        categories: props.labels,
+        labels: {
+            style: {
+                fontSize: "12px",
+                fontWeight: "bold",
+            },
+            hideOverlappingLabels: true,
+        },
+    },
+    yaxis: {
+        title: {
+            text: "ລະດັບນ້ຳ (m)",
+            style: {
+                fontSize: "12px",
+            },
+        },
+        min: props.currentLevels?.length
+            ? Math.max(
+                  0,
+                  Math.min(
+                      ...props.currentLevels.filter((val) => val !== null),
+                  ) - 2,
+              )
+            : 0,
+        max: props.currentLevels?.length
+            ? Math.max(
+                  props.bankHeight + 2,
+                  Math.max(
+                      ...props.currentLevels.filter((val) => val !== null),
+                  ) + 2,
+              )
+            : 20,
+        tickAmount: 6,
+        labels: {
+            formatter: (value) => {
+                return value.toFixed(1);
+            },
+        },
+    },
+    tooltip: {
+        shared: true,
+        intersect: false,
+        y: {
+            formatter: (value) => {
+                return value !== null ? `${value} m` : "N/A";
+            },
+        },
+    },
+    grid: {
+        borderColor: "#e0e0e0",
+        strokeDashArray: 5,
+        xaxis: {
+            lines: {
+                show: true,
+            },
+        },
+        yaxis: {
+            lines: {
+                show: true,
+            },
+        },
+        padding: {
+            right: 10,
+            left: 10,
+        },
+    },
+    legend: {
+        position: "bottom",
+        horizontalAlign: "center",
+    },
+    annotations: {
+        yaxis: [
+            {
+                y: props.bankHeight,
+                borderColor: "#10B981", // Green color for bank height
+                label: {
+                    borderColor: "#10B981",
+                    style: {
+                        color: "#10B981",
+                        // background: "#10B981",
+                        fontSize: "10px",
+                        fontWeight: "bold",
+                    },
+                    text: "ຄວາມສູງຂອງຕາຝັ່ງ",
+                    position: "center",
+                },
+            },
+            {
+                y: props.bankHeight * 0.8, // Warning level at 80% of bank height
+                borderColor: "#FF3B30",
+                strokeDashArray: 4,
+                label: {
+                    borderColor: "#FF3B30",
+                    style: {
+                        color: "#FF3B30",
+                        //background: "#F97316",
+                        fontSize: "10px",
+                        fontWeight: "bold",
+                    },
+                    text: "ລະດັບເຝົ້າລະວັງ",
+                    position: "center",
+                },
+            },
+        ],
+    },
+    stroke: {
+        curve: "smooth",
+        width: [3, 2], // Thicker line for current
+        dashArray: [0, 4], // Solid for current, dashed for predicted
+    },
+    responsive: [
+        {
+            breakpoint: 768, // Tablet
+            options: {
+                markers: {
+                    size: 3,
+                },
+                xaxis: {
+                    labels: {
+                        style: {
+                            fontSize: "11px",
+                        },
+                    },
+                },
+            },
+        },
+        {
+            breakpoint: 480, // Mobile
+            options: {
+                markers: {
+                    size: 2,
+                },
+                xaxis: {
+                    labels: {
+                        rotate: -45,
+                        rotateAlways: true,
+                        style: {
+                            fontSize: "10px",
+                        },
+                    },
+                },
+                yaxis: {
+                    title: {
+                        text: "ລະດັບນ້ຳ (m)", // Keep the title text
+                        style: {
+                            fontSize: "10px",
+                        },
+                    },
+                    labels: {
+                        show: true, // Ensure labels are visible
+                        formatter: (value) => {
+                            return value.toFixed(1);
+                        },
+                    },
+                },
+                legend: {
+                    position: "bottom",
+                    fontSize: "10px",
+                },
+                annotations: {
+                    yaxis: [
+                        {
+                            y: props.bankHeight,
+                            borderColor: "#10B981",
+                            label: {
+                                text: "ຕາຝັ່ງ", // Shorter text for mobile
+                                style: {
+                                    fontSize: "10px",
+                                },
+                            },
+                        },
+                    ],
+                },
+            },
+        },
+    ],
+}));
+
+const handleResize = () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        if (chart) {
+            chart.update();
+        }
+    }, 250);
+};
+
+onMounted(async () => {
+    if (!chartContainer.value) return;
+
+    try {
+        // Use static import instead of dynamic import
+        const ApexCharts = (await import("apexcharts")).default;
+
+        // Clear previous chart if exists
+        if (chart) {
+            chart.destroy();
+        }
+
+        chart = new ApexCharts(chartContainer.value, {
+            ...chartOptions.value,
+            series: series.value,
+        });
+
+        await chart.render();
+        window.addEventListener("resize", handleResize);
+    } catch (error) {
+        console.error("Error initializing chart:", error);
+    }
+});
+
+// Add deep watcher for data changes
+watch(
+    () => props.currentLevels,
+    (newVal) => {
+        if (chart) {
+            chart.updateSeries([
+                {
+                    name: "ລະດັບນ້ຳ",
+                    data: newVal,
+                },
+            ]);
+        }
+    },
+    { deep: true },
+);
+
+// Add cleanup for resize listener
+onBeforeUnmount(() => {
+    window.removeEventListener("resize", handleResize);
+    if (chart) {
+        chart.destroy();
+        chart = null;
+    }
+});
+</script>
+</file>
+
+<file path="pages/history.vue">
+<template>
+    <div class="p-4 md:p-6 lg:p-8 space-y-6 bg-gray-50 min-h-screen">
+        <!-- Header with language selector -->
+        <div
+            class="flex justify-between items-center mb-3 md:mb-4 bg-white p-2 md:p-3 rounded-lg shadow"
+        >
+            <h1 class="text-xl md:text-2xl font-bold">ຂໍ້ມູນທີ່ຜ່ານມາ</h1>
+            <!-- <div class="flex p-2 items-center">
+                <img src="~/assets/images/lao-flag.png" alt="" class="w-6 h-6 md:w-7 md:h-7 mr-1">
+                <div class="">
+                    <select id="devices" class="bg-white text-gray-900 text-xs md:text-sm rounded-xl block w-full px-2 md:px-3 py-1 md:py-2 text-center focus:outline-none">
+                        <option selected>ພາສາລາວ</option>
+                        <option value="US">ອັງກິດ</option>
+                        <option value="CA">ຈີນ</option>
+                    </select>
+                </div>
+            </div> -->
+        </div>
+
+        <!-- Filters Section - Improved responsiveness -->
+        <div class="bg-white rounded-lg shadow p-3 mb-4">
+            <h2 class="font-bold text-lg md:text-xl mb-2 md:mb-3">ຕົວເລືອກ</h2>
+            <div
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end"
+            >
+                <div>
+                    <label
+                        for="deviceId"
+                        class="block text-sm font-medium text-gray-600 mb-1"
+                        >ລະຫັດອຸປະກອນ</label
+                    >
+                    <select
+                        id="deviceId"
+                        v-model="filters.deviceId"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    >
+                        <option value="">ອຸປະກອນທັງໝົດ</option>
+                        <option value="dev-001">Device 001</option>
+                        <!-- <option value="dev-002">Device 002</option>
+                        <option value="dev-003">Device 003</option> -->
+                    </select>
+                </div>
+
+                <div>
+                    <label
+                        for="sensorId"
+                        class="block text-sm font-medium text-gray-600 mb-1"
+                        >ລະຫັດເຊັນເຊີ</label
+                    >
+                    <input
+                        type="text"
+                        id="sensorId"
+                        v-model="filters.sensorId"
+                        placeholder="Enter Sensor ID"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    />
+                </div>
+
+                <div>
+                    <label
+                        for="startDate"
+                        class="block text-sm font-medium text-gray-600 mb-1"
+                        >ເວລາເລີ່ມຕົ້ນ</label
+                    >
+                    <input
+                        type="date"
+                        id="startDate"
+                        v-model="filters.startDate"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    />
+                </div>
+                <div>
+                    <label
+                        for="endDate"
+                        class="block text-sm font-medium text-gray-600 mb-1"
+                        >ເວລາສິ້ນສຸດ</label
+                    >
+                    <input
+                        type="date"
+                        id="endDate"
+                        v-model="filters.endDate"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    />
+                </div>
+
+                <!-- Filter button made more responsive -->
+                <div class="sm:col-span-2 lg:col-span-4 pt-2">
+                    <button
+                        @click="applyFilters"
+                        :disabled="loading"
+                        class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <svg
+                            v-if="loading"
+                            class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                class="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"
+                            ></circle>
+                            <path
+                                class="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                        </svg>
+                        {{ loading ? "ກຳລັງໂຫຼດ..." : "ດຶງຂໍ້ມູນ" }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table/Card View Section with Responsive Toggle -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <!-- Toggle for different display modes -->
+            <div
+                class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-end"
+            >
+                <div class="flex space-x-2">
+                    <button
+                        @click="viewMode = 'table'"
+                        :class="[
+                            'px-3 py-1 text-sm font-medium rounded',
+                            viewMode === 'table'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                        ]"
+                    >
+                        ຮູບແບບຕາຕະລາງ
+                    </button>
+                    <button
+                        @click="viewMode = 'card'"
+                        :class="[
+                            'px-3 py-1 text-sm font-medium rounded',
+                            viewMode === 'card'
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+                        ]"
+                    >
+                        ຮູບແບບບັດ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table View - Responsive with horizontal scroll -->
+            <div v-if="viewMode === 'table'" class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                Reading ID
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                Device ID
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                Sensor ID
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                Timestamp
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                Value
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                Unit
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                Header 1
+                            </th>
+                            <th
+                                scope="col"
+                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                Header 2
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr v-if="loading && paginatedData.length === 0">
+                            <td
+                                :colspan="8"
+                                class="px-4 py-4 text-center text-gray-500"
+                            >
+                                <div class="flex justify-center items-center">
+                                    <svg
+                                        class="animate-spin h-8 w-8 text-blue-600"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            class="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="4"
+                                        ></circle>
+                                        <path
+                                            class="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-else-if="!loading && paginatedData.length === 0">
+                            <td
+                                :colspan="8"
+                                class="px-4 py-4 text-center text-gray-500"
+                            >
+                                No data available for the selected filters.
+                            </td>
+                        </tr>
+                        <tr
+                            v-else
+                            v-for="item in paginatedData"
+                            :key="item.readingId"
+                            class="hover:bg-gray-50 transition-colors duration-150"
+                        >
+                            <td
+                                class="px-4 py-4 whitespace-nowrap text-sm text-gray-700"
+                            >
+                                {{ item.readingId }}
+                            </td>
+                            <td
+                                class="px-4 py-4 whitespace-nowrap text-sm text-gray-700"
+                            >
+                                {{ item.deviceId }}
+                            </td>
+                            <td
+                                class="px-4 py-4 whitespace-nowrap text-sm text-gray-700"
+                            >
+                                {{ item.sensorId }}
+                            </td>
+                            <td
+                                class="px-4 py-4 whitespace-nowrap text-sm text-gray-500"
+                            >
+                                {{ formatTimestamp(item.timestamp) }}
+                            </td>
+                            <td
+                                class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                            >
+                                {{ item.value }}
+                            </td>
+                            <td
+                                class="px-4 py-4 whitespace-nowrap text-sm text-gray-500"
+                            >
+                                {{ item.unit }}
+                            </td>
+                            <td
+                                class="px-4 py-4 whitespace-nowrap text-sm text-gray-500"
+                            >
+                                {{ item.header1 }}
+                            </td>
+                            <td
+                                class="px-4 py-4 whitespace-nowrap text-sm text-gray-500"
+                            >
+                                {{ item.header2 }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Card View for Mobile - Alternative to table -->
+            <div
+                v-else-if="viewMode === 'card'"
+                class="divide-y divide-gray-200"
+            >
+                <div
+                    v-if="loading && paginatedData.length === 0"
+                    class="p-8 text-center"
+                >
+                    <svg
+                        class="animate-spin h-8 w-8 text-blue-600 mx-auto"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        ></circle>
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                    </svg>
+                </div>
+                <div
+                    v-else-if="!loading && paginatedData.length === 0"
+                    class="p-8 text-center text-gray-500"
+                >
+                    No data available for the selected filters.
+                </div>
+                <div
+                    v-else
+                    v-for="item in paginatedData"
+                    :key="item.readingId"
+                    class="p-4 hover:bg-gray-50 transition-colors duration-150"
+                >
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p
+                                class="text-xs font-medium text-gray-500 uppercase"
+                            >
+                                Reading ID
+                            </p>
+                            <p class="mt-1 text-sm text-gray-700">
+                                {{ item.readingId }}
+                            </p>
+                        </div>
+                        <div>
+                            <p
+                                class="text-xs font-medium text-gray-500 uppercase"
+                            >
+                                Device ID
+                            </p>
+                            <p class="mt-1 text-sm text-gray-700">
+                                {{ item.deviceId }}
+                            </p>
+                        </div>
+                        <div>
+                            <p
+                                class="text-xs font-medium text-gray-500 uppercase"
+                            >
+                                Sensor ID
+                            </p>
+                            <p class="mt-1 text-sm text-gray-700">
+                                {{ item.sensorId }}
+                            </p>
+                        </div>
+                        <div>
+                            <p
+                                class="text-xs font-medium text-gray-500 uppercase"
+                            >
+                                Timestamp
+                            </p>
+                            <p class="mt-1 text-sm text-gray-500">
+                                {{ formatTimestamp(item.timestamp) }}
+                            </p>
+                        </div>
+                        <div>
+                            <p
+                                class="text-xs font-medium text-gray-500 uppercase"
+                            >
+                                Value
+                            </p>
+                            <p class="mt-1 text-sm font-medium text-gray-900">
+                                {{ item.value }}
+                            </p>
+                        </div>
+                        <div>
+                            <p
+                                class="text-xs font-medium text-gray-500 uppercase"
+                            >
+                                Unit
+                            </p>
+                            <p class="mt-1 text-sm text-gray-500">
+                                {{ item.unit }}
+                            </p>
+                        </div>
+                        <div>
+                            <p
+                                class="text-xs font-medium text-gray-500 uppercase"
+                            >
+                                Header 1
+                            </p>
+                            <p class="mt-1 text-sm text-gray-500">
+                                {{ item.header1 }}
+                            </p>
+                        </div>
+                        <div>
+                            <p
+                                class="text-xs font-medium text-gray-500 uppercase"
+                            >
+                                Header 2
+                            </p>
+                            <p class="mt-1 text-sm text-gray-500">
+                                {{ item.header2 }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination Controls - Improved for better mobile experience -->
+            <div
+                v-if="!loading && totalPages > 1"
+                class="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
+            >
+                <!-- Mobile Pagination -->
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <button
+                        @click="prevPage"
+                        :disabled="currentPage === 1"
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Previous
+                    </button>
+                    <span class="text-sm text-gray-700">
+                        {{ currentPage }} / {{ totalPages }}
+                    </span>
+                    <button
+                        @click="nextPage"
+                        :disabled="currentPage === totalPages"
+                        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Next
+                    </button>
+                </div>
+
+                <!-- Desktop Pagination -->
+                <div
+                    class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between"
+                >
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Showing
+                            <span class="font-medium">{{
+                                (currentPage - 1) * itemsPerPage + 1
+                            }}</span>
+                            to
+                            <span class="font-medium">{{
+                                Math.min(currentPage * itemsPerPage, totalItems)
+                            }}</span>
+                            of
+                            <span class="font-medium">{{ totalItems }}</span>
+                            results
+                        </p>
+                    </div>
+                    <div>
+                        <nav
+                            class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                            aria-label="Pagination"
+                        >
+                            <button
+                                @click="prevPage"
+                                :disabled="currentPage === 1"
+                                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span class="sr-only">Previous</span>
+                                <svg
+                                    class="h-5 w-5"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                                        clip-rule="evenodd"
+                                    />
+                                </svg>
+                            </button>
+
+                            <template
+                                v-for="page in paginationRange"
+                                :key="page"
+                            >
+                                <button
+                                    v-if="typeof page === 'number'"
+                                    @click="goToPage(page)"
+                                    :class="[
+                                        'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium',
+                                        currentPage === page
+                                            ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                                            : 'text-gray-700 hover:bg-gray-50',
+                                    ]"
+                                >
+                                    {{ page }}
+                                </button>
+                                <span
+                                    v-else
+                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                                >
+                                    ...
+                                </span>
+                            </template>
+
+                            <button
+                                @click="nextPage"
+                                :disabled="currentPage === totalPages"
+                                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span class="sr-only">Next</span>
+                                <svg
+                                    class="h-5 w-5"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                        clip-rule="evenodd"
+                                    />
+                                </svg>
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div
+            v-if="error"
+            class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+            role="alert"
+        >
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline">{{ error }}</span>
+        </div>
+    </div>
+</template>
+
+<script setup>
+// --- Reactive State ---
+const loading = ref(false);
+const error = ref(null);
+const filters = reactive({
+    deviceId: "",
+    sensorId: "",
+    startDate: "",
+    endDate: "",
+});
+
+const viewMode = ref("table"); // Added view mode toggle: 'table' or 'card'
+const rawData = ref([]); // Holds all fetched data
+const currentPage = ref(1);
+const itemsPerPage = ref(10); // How many items to show per page
+
+// --- Mock Data Fetching ---
+// Replace this with your actual API call using useFetch or $fetch
+const fetchData = async () => {
+    loading.value = true;
+    error.value = null;
+    console.log("Fetching data with filters:", JSON.stringify(filters)); // Log filters being used
+    // Reset to first page whenever fetching new data based on filters
+    currentPage.value = 1; // Reset page number here
+
+    try {
+        // Simulate API delay
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // *** MOCK DATA GENERATION - REPLACE WITH ACTUAL API CALL ***
+        const mockItems = [];
+        const numItems = Math.floor(Math.random() * 50) + 5; // Generate 5 to 54 items
+
+        for (let i = 1; i <= numItems; i++) {
+            const deviceSuffix = String(Math.ceil(Math.random() * 3)).padStart(
+                3,
+                "0",
+            );
+            const sensorSuffix = String(Math.ceil(Math.random() * 5)).padStart(
+                3,
+                "0",
+            );
+            const matchesDeviceId =
+                !filters.deviceId || filters.deviceId === `dev-${deviceSuffix}`;
+            const matchesSensorId =
+                !filters.sensorId ||
+                `sensor-${sensorSuffix}`.includes(filters.sensorId);
+            // Basic date filtering (replace with proper date comparison)
+            const matchesStartDate = !filters.startDate; // Add logic here
+            const matchesEndDate = !filters.endDate; // Add logic here
+
+            if (
+                matchesDeviceId &&
+                matchesSensorId &&
+                matchesStartDate &&
+                matchesEndDate
+            ) {
+                mockItems.push({
+                    readingId: `rid-${Date.now()}-${i}`,
+                    deviceId: `dev-${deviceSuffix}`,
+                    sensorId: `sensor-${sensorSuffix}`,
+                    timestamp: new Date(
+                        Date.now() - Math.random() * 1000 * 3600 * 24 * 7,
+                    ), // Random timestamp in last 7 days
+                    value: (Math.random() * 100).toFixed(2),
+                    unit: `Unit  + ${String.fromCharCode(65 + (i % 3))}`, // A, B, C
+                    header1: `Header A-${i}`,
+                    header2: `Header B-${i}`,
+                });
+            }
+        }
+        rawData.value = mockItems.sort(
+            (a, b) =>
+                new Date(b.timestamp).getTime() -
+                new Date(a.timestamp).getTime(),
+        ); // Sort by newest first
+        // *** END MOCK DATA ***
+    } catch (err) {
+        console.error("Error fetching history data:", err);
+        error.value = "Failed to load history data. Please try again.";
+        rawData.value = []; // Clear data on error
+    } finally {
+        loading.value = false;
+    }
+};
+
+// --- Computed Properties ---
+const totalItems = computed(() => rawData.value.length);
+const totalPages = computed(() =>
+    Math.ceil(totalItems.value / itemsPerPage.value),
+);
+
+const paginatedData = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    return rawData.value.slice(start, end);
+});
+
+// --- Pagination Logic ---
+const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+    }
+};
+
+const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+        currentPage.value++;
+    }
+};
+
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+    }
+};
+
+// --- Enhanced Pagination Display Logic ---
+const paginationRange = computed(() => {
+    const current = currentPage.value;
+    const last = totalPages.value;
+    const delta = 1; // How many pages to show around the current page
+    const left = current - delta;
+    const right = current + delta + 1;
+    const range = [];
+    const rangeWithDots = [];
+    let l = null;
+
+    for (let i = 1; i <= last; i++) {
+        if (i === 1 || i === last || (i >= left && i < right)) {
+            range.push(i);
+        }
+    }
+
+    for (const i of range) {
+        if (l !== null) {
+            if (i - l === 2) {
+                rangeWithDots.push(l + 1);
+            } else if (i - l > 2) {
+                rangeWithDots.push("..."); // Represents skipped pages
+            }
+        }
+        rangeWithDots.push(i);
+        l = i;
+    }
+
+    return rangeWithDots;
+});
+
+// --- Event Handlers ---
+const applyFilters = () => {
+    currentPage.value = 1; // Go back to page 1 when applying new filters
+    fetchData();
+};
+
+// --- Utility Functions ---
+const formatTimestamp = (timestamp) => {
+    if (!timestamp) return "N/A";
+    try {
+        // Adjust formatting as needed (e.g., to locale string)
+        return new Date(timestamp).toLocaleString();
+    } catch (e) {
+        return String(timestamp); // Fallback
+    }
+};
+
+// --- Detect screen size for initial view mode ---
+const setInitialViewMode = () => {
+    // Set card view by default on smaller screens
+    if (window.innerWidth < 640) {
+        // 640px is Tailwind's 'sm' breakpoint
+        viewMode.value = "card";
+    }
+};
+
+// --- Lifecycle Hooks ---
+onMounted(() => {
+    setInitialViewMode(); // Set appropriate view mode based on screen size
+    fetchData(); // Fetch initial data when component loads
+
+    // Optional: Add window resize listener to switch views automatically
+    window.addEventListener("resize", () => {
+        if (window.innerWidth < 640 && viewMode.value === "table") {
+            viewMode.value = "card";
+        }
+    });
+});
+</script>
+<style scoped>
+/* Base styles for date inputs */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Improve tap target sizes on mobile */
+@media (max-width: 640px) {
+    button {
+        min-height: 44px;
+    }
+
+    input,
+    select {
+        min-height: 44px;
+    }
+
+    .pagination-button {
+        min-width: 44px;
+    }
+}
+
+/* Enhance table readability on smaller screens */
+@media (max-width: 768px) {
+    table {
+        font-size: 0.875rem;
+    }
+
+    th,
+    td {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+/* Add smooth transitions for view mode changes */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+/* Optional loading animation styles */
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+</style>
+</file>
+
+<file path="pages/index.vue">
+// dashboard page
+<template>
+  <div class="p-2 md:p-4">
+    <!-- header - responsive modifications -->
+    <div
+      class="flex justify-between items-center mb-3 md:mb-4 bg-white p-2 md:p-3 rounded-lg shadow"
+    >
+      <h1 class="text-xl md:text-2xl font-bold">Dashboard</h1>
+
+      <div class="flex p-2 items-center">
+        <img
+          src="~/assets/images/lao-flag.png"
+          alt=""
+          class="w-auto h-6 md:w-auto md:h-7 mr-1"
+        />
+        <div class="">
+          <select
+            id="devices"
+            class="bg-white text-gray-900 text-xs md:text-sm rounded-xl block w-full px-2 md:px-3 py-1 md:py-2 text-center focus:outline-none"
+          >
+            <option selected>ພາສາລາວ</option>
+            <option value="US">ອັງກິດ</option>
+            <option value="CA">ຈີນ</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="mb-2 flex justify-start mt-2">
+      <div class="inline-flex rounded-md shadow-sm">
+        <button
+          type="button"
+          class="py-1 px-3 text-sm font-medium text-white bg-aqua-primary rounded-l-lg"
+        >
+          ແບບງ່າຍ
+        </button>
+        <button
+          type="button"
+          class="py-1 px-3 text-sm font-medium text-gray-700 bg-white rounded-r-lg"
+        >
+          ລາຍລະອຽດ
+        </button>
+      </div>
+    </div>
+
+    <!-- first section - responsive grid -->
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4 mb-4"
+    >
+      <!-- stations -->
+      <div class="bg-white rounded-lg shadow p-3 flex flex-col">
+        <p class="font-bold text-xl md:text-2xl mb-1 md:mb-2">ສະຖານີ</p>
+        <div class="w-full mt-1 md:mt-3">
+          <div class="relative">
+            <select
+              class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-lg md:text-xl border border-slate-200 rounded-lg pl-2 md:pl-3 pr-8 py-2 md:py-3 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
+            >
+              <option value="">ສະຖານີ 1 - ບ້ານນາທັນ</option>
+              <option value="">ສະຖານີ 2 - ບ້ານທ່ານ້ຳ</option>
+              <option value="">ສະຖານີ 3 - ບ້ານດົງໂພນ</option>
+              <option value="">ສະຖານີ 4 - ບ້ານສະໜາມ</option>
+            </select>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.2"
+              stroke="currentColor"
+              class="h-5 w-5 md:h-6 md:w-6 ml-1 absolute top-3 md:top-3.5 right-2 md:right-2.5 text-slate-700"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+              />
+            </svg>
+          </div>
+        </div>
+        <span
+          class="text-xs text-blue-800 px-2 py-1 rounded-full text-center mt-1"
+        >
+          ອັບເດດ: 12:45 ນ. 12/05/2024
+          <span
+            v-if="isOfflineMode"
+            class="ml-2 bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full"
+          >
+            ອອບລາຍ
+          </span>
+        </span>
+      </div>
+
+      <!-- current status -->
+      <div class="bg-white rounded-lg shadow p-3">
+        <p class="font-bold text-xl md:text-2xl">ສະຖານະຄວາມສ່ຽງປັດຈຸບັນ:</p>
+        <div class="h-full flex flex-col items-center justify-center pb-2">
+          <p
+            :class="`font-bold text-3xl md:text-4xl ${
+              riskLevel === 'normal'
+                ? 'text-aqua-success'
+                : riskLevel === 'warning'
+                ? 'text-amber-500'
+                : 'text-aqua-critical'
+            }`"
+          >
+            ປົກກະຕິ
+          </p>
+          <p class="text-sm text-gray-600 mt-1">
+            (ບໍ່ຈໍາເປັນຕ້ອງດໍາເນີນການໃດໆ)
+          </p>
+          <div class="flex justify-center mt-2 w-full">
+            <div class="w-full max-w-xs bg-gray-200 rounded-full h-2.5">
+              <div
+                :class="`h-2.5 rounded-full ${
+                  riskLevel === 'normal'
+                    ? 'bg-aqua-success'
+                    : riskLevel === 'warning'
+                    ? 'bg-amber-500'
+                    : 'bg-aqua-critical'
+                }`"
+                :style="`width: ${
+                  riskLevel === 'normal'
+                    ? '15%'
+                    : riskLevel === 'warning'
+                    ? '50%'
+                    : '85%'
+                }`"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- signal strength & battery -->
+      <div class="flex flex-row sm:flex-col gap-x-2 gap-y-2">
+        <div
+          class="bg-white w-1/2 sm:w-full h-16 sm:h-1/2 rounded-lg flex items-center justify-center shadow p-1 md:p-2"
+        >
+          <div class="text-sm md:text-lg text-center">
+            ສະຖານະການເຊື່ອມຕໍ່:
+            <span class="text-aqua-green font-medium">ເຊື່ອມຕໍ່ແລ້ວ</span>
+          </div>
+        </div>
+        <div
+          class="bg-white w-1/2 sm:w-full h-16 sm:h-1/2 rounded-lg flex items-center justify-center shadow p-1 md:p-2"
+        >
+          <div class="text-sm md:text-lg text-center">
+            ສະຖານະແບັດເຕີລີ:
+            <span class="font-bold">75%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- soil moisture & water flow rate metrics -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 mb-4">
+      <!-- soil moisture -->
+      <div
+        class="bg-white rounded-lg shadow p-3 md:p-4 flex flex-col items-center"
+      >
+        <div class="font-bold text-lg md:text-2xl text-center">
+          ຄວາມຊຸ່ມຂອງດິນ:
+        </div>
+        <div class="flex items-center">
+          <span class="text-2xl md:text-4xl font-bold mt-2">75%</span>
+          <span class="text-sm ml-2 text-gray-600">(ສູງກວ່າປົກກະຕິ)</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 ml-1 text-aqua-critical"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 10l7-7m0 0l7 7m-7-7v18"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div
+        class="bg-white rounded-lg shadow p-3 md:p-4 flex flex-col items-center"
+      >
+        <div class="font-bold text-lg md:text-2xl text-center">
+          ຄວາມໄວການໄຫຼຂອງນ້ຳ:
+        </div>
+        <div class="flex items-center">
+          <span class="text-2xl md:text-4xl font-bold mt-1"
+            >120 m<sup>3</sup>/s</span
+          >
+          <span class="text-sm ml-2 text-gray-600">(ສູງກວ່າປົກກະຕິ)</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 ml-1 text-aqua-warning"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 10l7-7m0 0l7 7m-7-7v18"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Water level chart -->
+    <div class="bg-white rounded-lg shadow-sm p-3 md:p-4 mb-4">
+      <h2 class="text-base md:text-xl font-semibold mb-1.5">
+        ລະດັບນ້ຳ - ປັດຈຸບັນ ແລະ ການຄາດຄະເນ
+      </h2>
+      <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+        ອັບເດດ: 12:45 ນ. 12/05/2024
+      </span>
+      <ClientOnly>
+        <div v-if="waterLevelData.currentLevels" class="h-52 md:h-96">
+          <WaterLevelChart
+            :key="`water-level-${componentKey}`"
+            :current-levels="waterLevelData.currentLevels"
+            :predicted-levels="waterLevelData.predictedLevels"
+            :bank-height="waterLevelData.bankHeight"
+            :labels="daysOfWeek"
+          />
+        </div>
+        <template #fallback>
+          <div
+            class="h-40 md:h-64 bg-gray-50 rounded flex items-center justify-center"
+          >
+            <p class="text-gray-500">Loading Chart Data...</p>
+          </div>
+        </template>
+      </ClientOnly>
+      <p class="text-sm text-gray-500 mt-2">* ການຄາດຄະເນໃນ 24 ຊົ່ວໂມງຕໍ່ໜ້າ</p>
+      <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
+      <p class="text-aqua-info text-xs md:text-base font-semibold">
+        <span class="underline">ສະຫຼຸບ</span>:
+        ລະດັບນໍ້າຍັງຕໍ່າກວ່າລະດັບເຝົ້າລະວັງ 3 ແມັດ.
+        ການຄາດຄະເນສະແດງໃຫ້ເຫັນວ່າລະດັບນໍ້າຍັງຄົງທີ່ ແລະ ຍັງປອດໄພ.
+      </p>
+    </div>
+
+    <!-- Additional metrics -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 mb-4">
+      <!-- Rainfall rate -->
+      <div class="bg-white rounded-lg shadow p-3 md:p-4">
+        <h2 class="text-base md:text-xl font-semibold mb-2 md:mb-4">
+          ຄວາມຮຸນແຮງຂອງຝົນຕົກ
+        </h2>
+        <ClientOnly>
+          <BarChart
+            :key="`rainfall-intensity-${componentKey}`"
+            v-if="rainfallData.intensity"
+            :chart-data="rainfallData.intensity"
+            :categories="rainfallData.timeLabels"
+            :series-name="'ຄວາມຮຸນແຮງຂອງຝົນຕົກ'"
+            :y-axis-title="'mm/hr'"
+            :y-axis-unit="'mm/hr'"
+            :column-width="'40%'"
+            :color="'#0095FF'"
+            :height="250"
+          />
+          <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
+          <p class="text-aqua-info text-xs md:text-base font-semibold">
+            <span class="underline">ສະຫຼຸບ</span>::
+            ຄວາມຮຸນແຮງຂອງຝົນກໍາລັງຫຼຸດລົງ, ຊຶ່ງເປັນສັນຍານທີ່ດີ.
+          </p>
+          <template #fallback>
+            <div
+              class="h-40 md:h-48 bg-gray-50 rounded flex items-center justify-center"
+            >
+              <p class="text-gray-500">Loading rainfall data...</p>
+            </div>
+          </template>
+        </ClientOnly>
+      </div>
+
+      <!-- Accumulated rainfall -->
+      <div class="bg-white rounded-lg shadow p-3 md:p-4">
+        <h2 class="text-base md:text-xl font-semibold mb-2 md:mb-4">
+          ການສະສົມຂອງນ້ຳຝົນ
+        </h2>
+        <ClientOnly>
+          <BarChart
+            v-if="rainfallData.accumulated"
+            :key="`rainfall-accumulated-${componentKey}`"
+            :chart-data="rainfallData.accumulated"
+            :categories="daysOfWeek"
+            :series-name="'ການສະສົມຂອງນ້ຳຝົນຕໍ່ມື້'"
+            :y-axis-title="'mm'"
+            :y-axis-unit="'mm'"
+            :column-width="'50%'"
+            :height="250"
+          />
+          <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
+          <p class="text-aqua-info text-xs md:text-base font-semibold">
+            <span class="underline">ສະຫຼຸບ</span>::
+            ການສະສົມຂອງນ້ຳຝົນໃນອາທິດນີ້ຢູ່ໃນລະດັບປົກກະຕິ.
+          </p>
+          <template #fallback>
+            <div
+              class="h-40 md:h-48 bg-gray-50 rounded flex items-center justify-center"
+            >
+              <p class="text-gray-500">Loading accumulated rainfall data...</p>
+            </div>
+          </template>
+        </ClientOnly>
+      </div>
+    </div>
+  </div>
+</template>
+<script setup>
+import { ref, onMounted } from "vue";
+import WaterLevelChart from "~/components/charts/LineChart.client.vue";
+import BarChart from "~/components/charts/BarChart.client.vue";
+
+// Add a component key to force re-render
+const componentKey = ref(0);
+
+const isOfflineMode = ref(false);
+const riskLevel = ref("normal");
+const viewMode = ref("simple");
+
+// Sample data - in a real app, this would come from your API
+const daysOfWeek = ref([
+  "ຈັນ",
+  "ອັງຄານ",
+  "ພຸດ",
+  "ພະຫັດ",
+  "ສຸກ",
+  "ເສົາ",
+  "ອາທິດ",
+]);
+
+// Initialize with null or empty arrays for v-if check
+const waterLevelData = ref({
+  currentLevels: null,
+  predictedLevels: null,
+  bankHeight: 14, // Default or fetch
+});
+
+// Initialize rainfall data
+const rainfallData = ref({
+  intensity: null,
+  accumulated: null,
+  timeLabels: ["05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00"],
+});
+
+const loadData = async () => {
+  try {
+    // Increment the component key to force re-render
+    componentKey.value++;
+
+    // Simulate fetching data
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Set water level data
+    waterLevelData.value = {
+      currentLevels: [7.5, 9.8, 10.4, 10.8, 11, 11.2, 10.9],
+      predictedLevels: [null, null, null, null, null, 11.5, 11.8],
+      bankHeight: 14,
+    };
+
+    // Set the rainfall data
+    rainfallData.value = {
+      intensity: [92, 75, 60, 45, 35, 20, 10],
+      accumulated: [210, 230, 190, 160, 175, 135, 160],
+      timeLabels: [
+        "05:00",
+        "06:00",
+        "07:00",
+        "08:00",
+        "09:00",
+        "10:00",
+        "11:00",
+      ],
+    };
+  } catch (error) {
+    console.error("Failed to fetch or set data:", error);
+    // Handle error state
+  }
+};
+
+// Run on page load and whenever the component is activated
+onMounted(() => {
+  loadData();
+});
+
+// Make sure we clean up properly
+onBeforeUnmount(() => {
+  // Reset data when component is unmounted
+  waterLevelData.value = {
+    currentLevels: null,
+    predictedLevels: null,
+    bankHeight: 14,
+  };
+
+  rainfallData.value = {
+    intensity: null,
+    accumulated: null,
+    timeLabels: ["05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00"],
+  };
+});
+
+// Keep-alive hook
+if (typeof onActivated !== "undefined") {
+  onActivated(() => {
+    loadData();
+  });
+}
+</script>
+</file>
+
+</files>

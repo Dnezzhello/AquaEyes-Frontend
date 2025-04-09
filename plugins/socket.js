@@ -2,9 +2,10 @@
 import { io } from "socket.io-client";
 import { useAlertState } from "~/composables/useAlertState";
 
+// plugins/socket.js
 export default defineNuxtPlugin((nuxtApp) => {
   // Only run on client-side
-  if (!process.client) return;
+  if (process.server) return;
 
   const config = useRuntimeConfig();
   const baseURL = config.public.apiBaseUrl || "http://localhost:4558";
@@ -15,7 +16,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   const socket = io(baseURL, {
     transports: ["websocket", "polling"],
     autoConnect: true,
-    reconnection: true,
   });
 
   // Get alert state for notifications
@@ -23,7 +23,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   // Setup connection event handlers
   socket.on("connect", () => {
-    console.log("Socket connected");
+    console.log("Socket connected with ID:", socket.id);
   });
 
   socket.on("connect_error", (error) => {
@@ -36,13 +36,14 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   // Listen for new readings
   socket.on("new-reading", (data) => {
-    console.log("New reading received:", data);
+    console.log("New reading received:", JSON.stringify(data, null, 2));
   });
 
   // Listen for new alerts
   socket.on("new-alert", (alert) => {
     console.log("New alert received:", alert);
 
+    // Show alert notification based on severity
     if (alert.severity === "critical") {
       alertState.showCriticalAlert(formatAlertType(alert.type), alert.message);
     } else if (alert.severity === "warning" || alert.severity === "danger") {

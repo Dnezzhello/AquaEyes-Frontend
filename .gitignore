@@ -22,3 +22,15 @@ logs
 .env
 .env.*
 !.env.example
+
+# AI Assistant files
+.claude/
+.claudeignore
+CLAUDE.md
+.cursor/
+.cursorrules
+.github/copilot-instructions.md
+
+# AI generated files
+repomix-output.xml
+codebase-summary.md

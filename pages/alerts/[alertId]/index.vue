@@ -471,6 +471,33 @@ const formatAlertType = (type) => {
     }
 };
 
+const fetchAlertData = async () => {
+    const alertId = route.params.alertId;
+    loading.value = true;
+    error.value = null;
+
+    try {
+        // Fetch the alert details using the alert_id
+        const data = await fetchAlertById(alertId);
+        alert.value = data;
+    } catch (err) {
+        console.error("Error loading alert:", err);
+        error.value = err.message || "Failed to load alert details";
+
+        // Show fallback data in case of API failure
+        alert.value = {
+            alert_id: alertId,
+            type: "error",
+            severity: "critical",
+            message: "API Error: Could not load alert data",
+            status: "error",
+            created_at: new Date().toISOString(),
+        };
+    } finally {
+        loading.value = false;
+    }
+};
+
 // Fetch alert data based on route params
 onMounted(async () => {
     const alertId = route.params.alertId;

@@ -1,9 +1,9 @@
 // dashboard page
 <template>
-    <div class="p-2 md:p-4">
+    <div class="px-1 py-2 md:p-6 lg:p-8 space-y-6 bg-gray-50 min-h-screen">
         <!-- header - responsive modifications -->
         <div
-            class="flex justify-between items-center mb-3 md:mb-4 bg-white p-2 md:p-3 rounded-lg shadow"
+            class="flex justify-between items-center mb-2 md:mb-4 bg-white p-2 md:p-3 rounded-lg shadow"
         >
             <h1 class="text-xl md:text-2xl font-bold">Dashboard</h1>
 
@@ -27,10 +27,10 @@
 
         <!-- first section - responsive grid -->
         <div
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4 mb-4"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4 mb-3 md:mb-4"
         >
             <!-- stations -->
-            <div class="bg-white rounded-lg shadow p-3 flex flex-col">
+            <div class="bg-white rounded-lg shadow p-2 md:p-3 flex flex-col">
                 <p class="font-bold text-xl md:text-2xl mb-1 md:mb-2">ສະຖານີ</p>
                 <div class="w-full mt-1 md:mt-3">
                     <div class="relative">
@@ -79,7 +79,7 @@
             </div>
 
             <!-- current status -->
-            <div class="bg-white rounded-lg shadow p-3">
+            <div class="bg-white rounded-lg shadow p-2 md:p-3">
                 <p class="font-bold text-xl md:text-2xl">
                     ສະຖານະຄວາມສ່ຽງປັດຈຸບັນ:
                 </p>
@@ -150,10 +150,10 @@
         </div>
 
         <!-- Add this after your first grid section and before the soil moisture & water flow rate metrics -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 mb-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 mb-3 md:mb-4">
             <!-- Water Level Reading -->
             <div
-                class="bg-white rounded-lg shadow p-3 md:p-4 flex flex-col items-center"
+                class="bg-white rounded-lg shadow p-2 md:p-4 flex flex-col items-center"
             >
                 <div class="font-bold text-lg md:text-2xl text-center">
                     ລະດັບນ້ຳ:
@@ -206,7 +206,7 @@
 
             <!-- Rainfall Reading -->
             <div
-                class="bg-white rounded-lg shadow p-3 md:p-4 flex flex-col items-center"
+                class="bg-white rounded-lg shadow p-2 md:p-4 flex flex-col items-center"
             >
                 <div class="font-bold text-lg md:text-2xl text-center">
                     ປະລິມານນ້ຳຝົນ:
@@ -257,10 +257,10 @@
         </div>
 
         <!-- soil moisture & water flow rate metrics -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 mb-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 mb-3 md:mb-4">
             <!-- soil moisture -->
             <div
-                class="bg-white rounded-lg shadow p-3 md:p-4 flex flex-col items-center"
+                class="bg-white rounded-lg shadow p-2 md:p-4 flex flex-col items-center"
             >
                 <div class="font-bold text-lg md:text-2xl text-center">
                     ຄວາມຊຸ່ມຂອງດິນ:
@@ -311,7 +311,7 @@
 
             <!-- Flow rate -->
             <div
-                class="bg-white rounded-lg shadow p-3 md:p-4 flex flex-col items-center"
+                class="bg-white rounded-lg shadow p-2 md:p-4 flex flex-col items-center"
             >
                 <div class="font-bold text-lg md:text-2xl text-center">
                     ຄວາມໄວການໄຫຼຂອງນ້ຳ:
@@ -362,7 +362,7 @@
         </div>
 
         <!-- Water level chart -->
-        <div class="bg-white rounded-lg shadow-sm p-3 md:p-4 mb-4">
+        <div class="bg-white rounded-lg shadow-sm p-2 md:p-4 mb-3 md:mb-4">
             <h2 class="text-base md:text-xl font-semibold mb-1.5">
                 ລະດັບປັດຈຸບັນ
             </h2>
@@ -404,9 +404,9 @@
         </div>
 
         <!-- Additional metrics -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 mb-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 mb-3 md:mb-4">
             <!-- Rainfall rate -->
-            <div class="bg-white rounded-lg shadow p-3 md:p-4">
+            <div class="bg-white rounded-lg shadow p-2 md:p-4">
                 <h2 class="text-base md:text-xl font-semibold mb-2 md:mb-4">
                     ຄວາມຮຸນແຮງຂອງຝົນຕົກ
                 </h2>
@@ -443,7 +443,7 @@
             </div>
 
             <!-- Accumulated rainfall -->
-            <div class="bg-white rounded-lg shadow p-3 md:p-4">
+            <div class="bg-white rounded-lg shadow p-2 md:p-4">
                 <h2 class="text-base md:text-xl font-semibold mb-2 md:mb-4">
                     ການສະສົມຂອງນ້ຳຝົນ
                 </h2>

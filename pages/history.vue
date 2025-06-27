@@ -11,7 +11,6 @@
                     <select id="devices" class="bg-white text-gray-900 text-xs md:text-sm rounded-xl block w-full px-2 md:px-3 py-1 md:py-2 text-center focus:outline-none">
                         <option selected>ພາສາລາວ</option>
                         <option value="US">ອັງກິດ</option>
-                        <option value="CA">ຈີນ</option>
                     </select>
                 </div>
             </div> -->

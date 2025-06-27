@@ -40,7 +40,7 @@
 
             <!-- Navigation -->
             <div class="flex-1 overflow-y-auto">
-                <nav class="p-2">
+                <nav class="p-2 bg-red-300">
                     <!-- Dashboard -->
                     <NuxtLink
                         to="/"

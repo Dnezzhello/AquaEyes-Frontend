@@ -19,6 +19,27 @@
             <div
                 class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end"
             >
+                <div>
+                    <label
+                        for="deviceFilter"
+                        class="block text-sm font-medium text-gray-600 mb-1"
+                        >ອຸປະກອນ</label
+                    >
+                    <select
+                        id="deviceFilter"
+                        v-model="filters.deviceId"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    >
+                        <option value="">ທັງໝົດ</option>
+                        <option
+                            v-for="device in devices"
+                            :key="device.device_id"
+                            :value="device.device_id"
+                        >
+                            {{ device.name || device.device_id }}
+                        </option>
+                    </select>
+                </div>
                 <!-- Alert Type Filter -->
                 <div>
                     <label
@@ -87,6 +108,12 @@
                             ></path>
                         </svg>
                         {{ loading ? "ກຳລັງໂຫຼດ..." : "ດຶງຂໍ້ມູນ" }}
+                    </button>
+                    <button
+                        @click="resetFilters"
+                        class="ml-2 w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        ລ້າງຕົວກອງ
                     </button>
                 </div>
             </div>
@@ -198,7 +225,7 @@
                         <tr
                             v-else
                             v-for="alert in paginatedAlerts"
-                            :key="alert.id"
+                            :key="alert.alert_id"
                             class="hover:bg-gray-50 transition-colors duration-150"
                             @click="showAlertDetails(alert)"
                         >
@@ -207,36 +234,40 @@
                                     <div
                                         :class="[
                                             'flex-shrink-0 p-1 rounded-full',
-                                            alert.type === 'critical'
+                                            alert.severity === 'critical'
                                                 ? 'text-red-500'
-                                                : alert.type === 'warning'
-                                                  ? 'text-yellow-500'
-                                                  : 'text-blue-500',
+                                                : alert.severity === 'danger'
+                                                  ? 'text-orange-500'
+                                                  : alert.severity === 'warning'
+                                                    ? 'text-yellow-500'
+                                                    : 'text-blue-500',
                                         ]"
                                     >
                                         <ExclamationCircleIcon
-                                            v-if="alert.type === 'critical'"
+                                            v-if="
+                                                alert.severity === 'critical' ||
+                                                alert.severity === 'danger'
+                                            "
                                             class="w-5 h-5"
                                         />
                                         <ExclamationTriangleIcon
-                                            v-if="alert.type === 'warning'"
+                                            v-if="alert.severity === 'warning'"
                                             class="w-5 h-5"
                                         />
                                         <InformationCircleIcon
-                                            v-if="alert.type === 'info'"
+                                            v-if="alert.severity === 'info'"
                                             class="w-5 h-5"
                                         />
                                     </div>
-                                    <span
-                                        class="ml-2 font-semibold capitalize"
-                                        >{{ alert.type }}</span
-                                    >
+                                    <span class="ml-2 font-semibold capitalize">
+                                        {{ formatAlertType(alert.type) }}
+                                    </span>
                                 </div>
                             </td>
                             <td
                                 class="px-4 py-4 whitespace-nowrap text-sm text-gray-500"
                             >
-                                {{ alert.time }}
+                                {{ formatTimeAgo(alert.created_at) }}
                             </td>
                             <td class="px-4 py-4 text-sm text-gray-700">
                                 {{ alert.message }}
@@ -295,7 +326,7 @@
                 <AlertCard
                     v-else
                     v-for="alert in paginatedAlerts"
-                    :key="alert.id"
+                    :key="alert.alert_id"
                     :alert="alert"
                     @click="showAlertDetails(alert)"
                 />
@@ -407,17 +438,6 @@
             <strong class="font-bold">Error!</strong>
             <span class="block sm:inline">{{ error }}</span>
         </div>
-
-        <!-- Alert Modals -->
-        <AlertModal
-            v-if="showModal"
-            :type="activeModal.type"
-            :title="activeModal.title"
-            :message="activeModal.message"
-            @close="showModal = false"
-            @dismiss="handleDismiss"
-            @confirm="handleConfirm"
-        />
     </div>
 </template>
 
@@ -433,149 +453,201 @@ import {
 } from "@heroicons/vue/24/outline";
 import AlertCard from "~/components/cards/AlertCard.vue";
 import AlertModal from "~/components/modals/AlertModal.vue";
+import { useApi } from "~/composables/useApi"; // Import the API composable
 
 // Reactive State
 const loading = ref(false);
 const error = ref(null);
 const showModal = ref(false);
-const viewMode = ref("list"); // 'list' or 'card'
+const viewMode = ref("list");
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const totalApiItems = ref(0); // Store total items count from API
 
 const route = useRoute();
 const router = useRouter();
+const { fetchAlerts, fetchDevices, fetchDeviceAlerts } = useApi();
 
-// Filters
+const devices = ref([]);
+
+// Update filters to include deviceId
 const filters = reactive({
     type: "",
     dateRange: "all",
+    deviceId: "", // New filter for device
 });
 
-// Modal state
-const activeModal = ref({
-    type: "critical",
-    title: "Critical",
-    message:
-        "ສະຖານີ 1 | ລະດັບນ້ຳຂີດຕລະບຸ: 14ມ (ຄວາມຮຸນແຮງອາກາດ: 13ມ) | ເວລາເຂົ້າເຖິງອີກ: 1 ຊົ່ວໂມງ",
-});
+// Raw alert data from API
+const rawAlerts = ref([]);
 
-// Raw alert data
-const rawAlerts = ref([
-    {
-        type: "critical",
-        time: "1 hour ago",
-        message:
-            "ສະຖານີ 1 | ລະດັບນ້ຳຂີດຕລະບຸ: 14ມ (Warn: 13ມ) | ເວລາເຂົ້າເຖິງອີກ: 1 ຊົ່ວໂມງ",
-        id: 1,
-    },
-    {
-        type: "warning",
-        time: "1 hour ago",
-        message: "ສະຖານີ 1 | 10ມ (Warn: 13ມ) ↑ 30ຊມ/ຊົ່ວໂມງ",
-        id: 2,
-    },
-    {
-        type: "critical",
-        time: "1 hour ago",
-        message:
-            "ສະຖານີ 1 | ລະດັບນ້ຳຂີດຕລະບຸ: 14ມ (Warn: 13ມ) | ເວລາເຂົ້າເຖິງອີກ: 1 ຊົ່ວໂມງ",
-        id: 3,
-    },
-    {
-        type: "info",
-        time: "1 hour ago",
-        message: "Sensor | ສະຖານີ 1 | Battery: 100% | ຄວາມແຮງຂອງສັນຍານ: X",
-        id: 4,
-    },
-    {
-        type: "warning",
-        time: "1 hour ago",
-        message: "ສະຖານີ 1 | 10ມ (Warn: 13ມ) ↑ 30ຊມ/ຊົ່ວໂມງ",
-        id: 5,
-    },
-    {
-        type: "info",
-        time: "2 hours ago",
-        message: "Sensor | ສະຖານີ 2 | Battery: 85% | ຄວາມແຮງຂອງສັນຍານ: XX",
-        id: 6,
-    },
-    {
-        type: "critical",
-        time: "3 hours ago",
-        message:
-            "ສະຖານີ 2 | ລະດັບນ້ຳຂີດຕລະບຸ: 12ມ (Warn: 10ມ) | ເວລາເຂົ້າເຖິງອີກ: 2 ຊົ່ວໂມງ",
-        id: 7,
-    },
-    {
-        type: "warning",
-        time: "4 hours ago",
-        message: "ສະຖານີ 3 | 8ມ (Warn: 9ມ) ↑ 25ຊມ/ຊົ່ວໂມງ",
-        id: 8,
-    },
-    {
-        type: "info",
-        time: "5 hours ago",
-        message: "Sensor | ສະຖານີ 3 | Battery: 90% | ຄວາມແຮງຂອງສັນຍານ: XXX",
-        id: 9,
-    },
-    {
-        type: "warning",
-        time: "6 hours ago",
-        message: "ສະຖານີ 2 | 7ມ (Warn: 10ມ) ↑ 20ຊມ/ຊົ່ວໂມງ",
-        id: 10,
-    },
-    {
-        type: "critical",
-        time: "7 hours ago",
-        message:
-            "ສະຖານີ 3 | ລະດັບນ້ຳຂີດຕລະບຸ: 11ມ (Warn: 9ມ) | ເວລາເຂົ້າເຖິງອີກ: 3 ຊົ່ວໂມງ",
-        id: 11,
-    },
-    {
-        type: "info",
-        time: "8 hours ago",
-        message: "Sensor | ສະຖານີ 1 | Battery: 75% | ຄວາມແຮງຂອງສັນຍານ: XX",
-        id: 12,
-    },
-]);
+// Fetch available devices for the filter
+const fetchAvailableDevices = async () => {
+    try {
+        const deviceList = await fetchDevices();
+        devices.value = deviceList;
+    } catch (err) {
+        console.error("Failed to load devices for filter:", err);
+    }
+};
 
-// Filtered alerts based on filters
-const filteredAlerts = computed(() => {
-    return rawAlerts.value.filter((alert) => {
-        // Filter by type
-        if (filters.type && alert.type !== filters.type) {
-            return false;
+// Fetch data from API
+const fetchAlertsData = async () => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+        // If a device ID is specified, use the device-specific alerts API
+        if (filters.deviceId) {
+            const deviceAlerts = await fetchDeviceAlerts(filters.deviceId);
+
+            // Filter by type if needed
+            let filteredAlerts = deviceAlerts;
+            if (filters.type) {
+                filteredAlerts = deviceAlerts.filter(
+                    (alert) =>
+                        alert.severity === filters.type ||
+                        alert.type === filters.type,
+                );
+            }
+
+            // Filter by date range
+            if (filters.dateRange !== "all") {
+                filteredAlerts = filterAlertsByDate(
+                    filteredAlerts,
+                    filters.dateRange,
+                );
+            }
+
+            // Apply pagination manually for device-specific alerts
+            const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+            const endIndex = startIndex + itemsPerPage.value;
+
+            rawAlerts.value = filteredAlerts.slice(startIndex, endIndex);
+            totalApiItems.value = filteredAlerts.length;
+        } else {
+            // Use the general alerts API when no device is selected
+            const apiFilters = {
+                type: filters.type,
+                dateRange:
+                    filters.dateRange !== "all" ? filters.dateRange : undefined,
+                page: currentPage.value,
+                limit: itemsPerPage.value,
+            };
+
+            const response = await fetchAlerts(apiFilters);
+            rawAlerts.value = response.alerts || [];
+            totalApiItems.value = response.total || rawAlerts.value.length;
         }
+    } catch (err) {
+        error.value = err.message || "Failed to load alerts";
+        rawAlerts.value = [];
+    } finally {
+        loading.value = false;
+    }
+};
 
-        // Filter by date range (simplified for demo)
-        if (filters.dateRange !== "all") {
-            // Implement date filtering logic here
-            // For this example, we'll just include all alerts
-            return true;
+const filterAlertsByDate = (alerts, dateRange) => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    return alerts.filter((alert) => {
+        const alertDate = new Date(alert.created_at);
+
+        switch (dateRange) {
+            case "today":
+                return alertDate >= today;
+            case "yesterday":
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                return alertDate >= yesterday && alertDate < today;
+            case "week":
+                const lastWeek = new Date(today);
+                lastWeek.setDate(lastWeek.getDate() - 7);
+                return alertDate >= lastWeek;
+            case "month":
+                const lastMonth = new Date(today);
+                lastMonth.setMonth(lastMonth.getMonth() - 1);
+                return alertDate >= lastMonth;
+            default:
+                return true;
         }
-
-        return true;
     });
-});
+};
+
+const resetFilters = () => {
+    filters.type = "";
+    filters.dateRange = "all";
+    filters.deviceId = "";
+    currentPage.value = 1;
+    fetchAlertsData();
+};
+
+// Format helpers
+const formatTimeAgo = (dateString) => {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+
+    // Convert to seconds
+    const diffSec = Math.floor(diffMs / 1000);
+
+    if (diffSec < 60) return `${diffSec} seconds ago`;
+
+    // Convert to minutes
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin} minute${diffMin > 1 ? "s" : ""} ago`;
+
+    // Convert to hours
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return `${diffHour} hour${diffHour > 1 ? "s" : ""} ago`;
+
+    // Convert to days
+    const diffDay = Math.floor(diffHour / 24);
+    if (diffDay < 30) return `${diffDay} day${diffDay > 1 ? "s" : ""} ago`;
+
+    // Convert to months
+    const diffMonth = Math.floor(diffDay / 30);
+    if (diffMonth < 12)
+        return `${diffMonth} month${diffMonth > 1 ? "s" : ""} ago`;
+
+    // Convert to years
+    const diffYear = Math.floor(diffMonth / 12);
+    return `${diffYear} year${diffYear > 1 ? "s" : ""} ago`;
+};
+
+const formatAlertType = (type) => {
+    switch (type) {
+        case "flood_warning":
+            return "ເຕືອນໄພນ້ຳຖ້ວມ";
+        case "sensor_failure":
+            return "ເຊັນເຊີເສຍຫາຍ";
+        case "battery_low":
+            return "ແບັດເຕີຣີຕ່ຳ";
+        case "connection_loss":
+            return "ການເຊື່ອມຕໍ່ຂາດ";
+        default:
+            return type;
+    }
+};
 
 // Computed Properties
-const totalItems = computed(() => filteredAlerts.value.length);
+const totalItems = computed(() => totalApiItems.value);
+
 const totalPages = computed(() =>
-    Math.ceil(totalItems.value / itemsPerPage.value),
+    Math.max(1, Math.ceil(totalItems.value / itemsPerPage.value)),
 );
 
-// Paginated alerts for current page
-const paginatedAlerts = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage.value;
-    const end = start + itemsPerPage.value;
-    return filteredAlerts.value.slice(start, end);
-});
+// We're using the raw data directly now since the API already gives us paginated data
+const paginatedAlerts = computed(() => rawAlerts.value);
 
 // Enhanced pagination display logic
 const paginationRange = computed(() => {
+    // Your existing pagination logic
     const current = currentPage.value;
     const last = totalPages.value;
-    const delta = 1; // How many pages to show around the current page
+    const delta = 1;
     const left = current - delta;
     const right = current + delta + 1;
     const range = [];
@@ -593,7 +665,7 @@ const paginationRange = computed(() => {
             if (i - l === 2) {
                 rangeWithDots.push(l + 1);
             } else if (i - l > 2) {
-                rangeWithDots.push("..."); // Represents skipped pages
+                rangeWithDots.push("...");
             }
         }
         rangeWithDots.push(i);
@@ -603,81 +675,71 @@ const paginationRange = computed(() => {
     return rangeWithDots;
 });
 
-// Pagination Methods
+// Pagination Methods - updated to fetch new data when page changes
 const goToPage = (page) => {
     if (page >= 1 && page <= totalPages.value) {
         currentPage.value = page;
+        fetchAlertsData(); // Fetch new data for the selected page
     }
 };
 
 const nextPage = () => {
     if (currentPage.value < totalPages.value) {
         currentPage.value++;
+        fetchAlertsData(); // Fetch data for next page
     }
 };
 
 const prevPage = () => {
     if (currentPage.value > 1) {
         currentPage.value--;
+        fetchAlertsData(); // Fetch data for previous page
     }
 };
 
 // Filter application
 const applyFilters = () => {
-    loading.value = true;
     currentPage.value = 1; // Reset to first page when applying filters
-
-    // Simulate API delay
-    setTimeout(() => {
-        loading.value = false;
-    }, 500);
+    fetchAlertsData(); // Fetch filtered data
 };
 
-// Modal functions
+// Show alert details
 const showAlertDetails = (alert) => {
-    router.push(`/alerts/${alert.id}`);
-    // activeModal.value = {
-    //     type: alert.type,
-    //     title: alert.type.charAt(0).toUpperCase() + alert.type.slice(1),
-    //     message: alert.message,
-    // };
-    // showModal.value = true;
+    router.push(`/alerts/${alert.alert_id}`);
 };
 
 const handleDismiss = () => {
     showModal.value = false;
-    // Add logic to dismiss alert
     console.log("Alert dismissed");
 };
 
 const handleConfirm = () => {
     showModal.value = false;
-    // Add logic to confirm alert
     console.log("Alert confirmed");
 };
 
 // Set initial view mode based on screen size
 const setInitialViewMode = () => {
-    // Set card view by default on smaller screens
     if (window.innerWidth < 640) {
-        // 640px is Tailwind's 'sm' breakpoint
         viewMode.value = "card";
     }
 };
 
-// Lifecycle hooks
+// Update onMounted to fetch devices
 onMounted(() => {
-    setInitialViewMode(); // Set appropriate view mode based on screen size
+    setInitialViewMode();
 
-    // Optional: Add window resize listener to switch views automatically
     window.addEventListener("resize", () => {
         if (window.innerWidth < 640 && viewMode.value === "list") {
             viewMode.value = "card";
         }
     });
 
-    // Fetch initial data
-    applyFilters();
+    // Fetch devices for the filter dropdown
+    fetchAvailableDevices();
+
+    // Fetch initial alerts data
+    fetchAlertsData();
 });
 </script>
 

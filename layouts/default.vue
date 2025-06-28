@@ -27,7 +27,7 @@
                     <img
                         src="~/assets/images/aquaeyes-logo.png"
                         alt="AquaEyes"
-                        class="h-8 w-auto lg:h-10 lg:w-auto"
+                        class="h-8 w-9 lg:h-10 lg:w-14"
                     />
                 </div>
                 <img

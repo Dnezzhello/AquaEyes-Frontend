@@ -43,10 +43,19 @@ export default defineNuxtPlugin((nuxtApp) => {
   socket.on("new-alert", (alert) => {
     console.log("New alert received:", alert);
 
-    // Show alert notification based on severity
+    // Filter out sensor_failure alerts from popup notifications
+    // (they still get saved to database on backend)
+    if (alert.type === "sensor_failure") {
+      console.log("Sensor failure alert received - saved to database but not showing popup");
+      return;
+    }
+
+    // Show alert notification based on severity for other alert types
     if (alert.severity === "critical") {
       alertState.showCriticalAlert(formatAlertType(alert.type), alert.message);
-    } else if (alert.severity === "warning" || alert.severity === "danger") {
+    } else if (alert.severity === "danger") {
+      alertState.showDangerAlert(formatAlertType(alert.type), alert.message);
+    } else if (alert.severity === "warning") {
       alertState.showWarningAlert(formatAlertType(alert.type), alert.message);
     } else {
       alertState.showInfoAlert(formatAlertType(alert.type), alert.message);
@@ -58,6 +67,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     switch (type) {
       case "flood_warning":
         return "ເຕືອນໄພນ້ຳຖ້ວມ";
+      case "rainfall_warning":
+        return "ເຕືອນຝົນຕົກໜັກ";
+      case "soil_saturation_warning":
+        return "ເຕືອນດິນອີ່ມນ້ຳ";
       case "sensor_failure":
         return "ເຊັນເຊີເສຍຫາຍ";
       case "battery_low":

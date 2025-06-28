@@ -97,7 +97,7 @@ const chartOptions = computed(() => ({
     },
     yaxis: {
         title: {
-            text: "ລະດັບນ້ຳ (m)",
+            text: "ລະດັບນ້ຳ (cm)",
             style: {
                 fontSize: "12px",
             },
@@ -229,7 +229,7 @@ const chartOptions = computed(() => ({
                 },
                 yaxis: {
                     title: {
-                        text: "ລະດັບນ້ຳ (m)", // Keep the title text
+                        text: "ລະດັບນ້ຳ (cm)", // Keep the title text
                         style: {
                             fontSize: "10px",
                         },

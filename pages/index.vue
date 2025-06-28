@@ -409,9 +409,9 @@
                     </p>
                 </div>
             </ClientOnly>
-            <p class="text-sm text-gray-500 mt-2">
+            <!-- <p class="text-sm text-gray-500 mt-2">
                 * ການຄາດຄະເນໃນ 24 ຊົ່ວໂມງຕໍ່ໜ້າ
-            </p>
+            </p> -->
         </div>
 
         <!-- Additional metrics -->
@@ -609,9 +609,9 @@ const getLastUpdateTime = () => {
 const riskLevel = computed(() => {
     if (!latestReadings.value) return "normal";
 
-    // Thresholds matching backend simulator configuration
+    // Thresholds matching backend configuration (ultrasonic sensor for water level)
     const thresholds = {
-        waterLevel: { warning: 150, danger: 250, critical: 350 }, // cm
+        waterLevel: { warning: 150, danger: 100, critical: 50 }, // cm (distance from sensor)
         flowRate: { warning: 10, danger: 20, critical: 30 }, // m³/s  
         rainfall: { warning: 10, danger: 25, critical: 50 }, // mm
         soilMoisture: { warning: 70, danger: 85, critical: 95 } // %
@@ -633,12 +633,24 @@ const riskLevel = computed(() => {
             const sensorThresholds = thresholds[sensor.name];
             let sensorRisk = "normal";
             
-            if (sensor.data >= sensorThresholds.critical) {
-                sensorRisk = "critical";
-            } else if (sensor.data >= sensorThresholds.danger) {
-                sensorRisk = "danger";
-            } else if (sensor.data >= sensorThresholds.warning) {
-                sensorRisk = "warning";
+            // Water level uses ultrasonic distance: lower distance = higher water = more dangerous
+            if (sensor.name === 'waterLevel') {
+                if (sensor.data <= sensorThresholds.critical) {
+                    sensorRisk = "critical";
+                } else if (sensor.data <= sensorThresholds.danger) {
+                    sensorRisk = "danger";
+                } else if (sensor.data <= sensorThresholds.warning) {
+                    sensorRisk = "warning";
+                }
+            } else {
+                // Other sensors: higher values = more dangerous
+                if (sensor.data >= sensorThresholds.critical) {
+                    sensorRisk = "critical";
+                } else if (sensor.data >= sensorThresholds.danger) {
+                    sensorRisk = "danger";
+                } else if (sensor.data >= sensorThresholds.warning) {
+                    sensorRisk = "warning";
+                }
             }
             
             // Consider trends - if rising rapidly, increase risk level
@@ -710,21 +722,21 @@ const getRiskingFactors = () => {
     
     const factors = [];
     const thresholds = {
-        waterLevel: { warning: 150, danger: 250, critical: 350 },
+        waterLevel: { warning: 150, danger: 100, critical: 50 },
         flowRate: { warning: 10, danger: 20, critical: 30 },
         rainfall: { warning: 10, danger: 25, critical: 50 },
         soilMoisture: { warning: 70, danger: 85, critical: 95 }
     };
     
-    // Check each sensor for risk levels
-    if (latestReadings.value.waterLevel?.latest >= thresholds.waterLevel.warning) {
+    // Check each sensor for risk levels (water level uses <= for ultrasonic distance)
+    if (latestReadings.value.waterLevel?.latest <= thresholds.waterLevel.warning) {
         factors.push("ລະດັບນ້ຳ");
     }
     if (latestReadings.value.rainfall?.latest >= thresholds.rainfall.warning) {
         factors.push("ຝົນຕົກ");
     }
     if (latestReadings.value.flowRate?.latest >= thresholds.flowRate.warning) {
-        factors.push("ການໄຫຼ");
+        factors.push("ການໄຫຼຂອງນ້ຳ");
     }
     if (latestReadings.value.soilMoisture?.latest >= thresholds.soilMoisture.warning) {
         factors.push("ດິນຊຸ່ມ");
@@ -738,9 +750,9 @@ const getTrendingFactors = () => {
     const trends = [];
     
     if (getWaterLevelDirection() === 'up') trends.push("ນ້ຳຂຶ້ນ");
-    if (getRainfallDirection() === 'up') trends.push("ຝົນເພີ່ມ");
-    if (getFlowRateDirection() === 'up') trends.push("ໄຫຼແຮງ");
-    if (getSoilMoistureDirection() === 'up') trends.push("ດິນອິ່ມ");
+    if (getRainfallDirection() === 'up') trends.push("ຝົນຕົກເພີ່ມ");
+    if (getFlowRateDirection() === 'up') trends.push("ນໍ້າໄຫຼແຮງ");
+    if (getSoilMoistureDirection() === 'up') trends.push("ດິນອິ່ມນ້ຳ");
     
     return trends.length > 0 ? `(${trends.join(", ")})` : "";
 };
@@ -860,11 +872,12 @@ const getWaterLevelDirection = () => {
     );
     if (values.length < 2) return null;
 
-    const current = values[values.length - 1];   // Most recent reading
-    const previous = values[values.length - 2];  // Previous reading
+    const current = values[values.length - 1];   // Most recent distance reading
+    const previous = values[values.length - 2];  // Previous distance reading
 
-    if (current > previous) return "up";     // DANGER: Water level rising
-    if (current < previous) return "down";   // SAFE: Water level falling
+    // For ultrasonic sensor: decreasing distance = rising water level = DANGER
+    if (current < previous) return "up";     // DANGER: Water level rising (distance decreasing)
+    if (current > previous) return "down";   // SAFE: Water level falling (distance increasing)
     return null;  // No change or insufficient data
 };
 

@@ -25,6 +25,13 @@ const actions = {
     state.showAlert = true;
   },
 
+  showDangerAlert(title, message) {
+    state.type = "danger";
+    state.title = title;
+    state.message = message;
+    state.showAlert = true;
+  },
+
   showCriticalAlert(title, message) {
     state.type = "critical";
     state.title = title;

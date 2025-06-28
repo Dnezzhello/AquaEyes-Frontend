@@ -10,7 +10,6 @@
             :title="alertState.state.title"
             :message="alertState.state.message"
             @dismiss="alertState.hideAlert"
-            @confirm="alertState.hideAlert"
         />
     </NuxtLayout>
 </template>

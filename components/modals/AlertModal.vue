@@ -31,6 +31,17 @@
                         </h3>
                     </div>
 
+                    <div v-if="type === 'danger'" class="text-orange-500">
+                        <div
+                            class="w-20 h-20 rounded-full border-4 border-orange-500 flex items-center justify-center mx-auto"
+                        >
+                            <ExclamationTriangleIcon class="w-12 h-12" />
+                        </div>
+                        <h3 class="mt-2 text-xl font-bold text-center">
+                            {{ title }}
+                        </h3>
+                    </div>
+
                     <div v-if="type === 'info'" class="text-blue-500">
                         <div
                             class="w-20 h-20 rounded-full border-4 border-blue-500 flex items-center justify-center mx-auto"
@@ -49,18 +60,12 @@
                 </div>
 
                 <!-- Modal Actions -->
-                <div class="flex flex-col sm:flex-row gap-2 justify-center">
+                <div class="flex justify-center">
                     <button
                         @click="$emit('dismiss')"
                         class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
                     >
                         Dismiss
-                    </button>
-                    <button
-                        @click="$emit('confirm')"
-                        class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
-                    >
-                        Confirm
                     </button>
                 </div>
             </div>
@@ -79,7 +84,7 @@ defineProps({
     type: {
         type: String,
         required: true,
-        validator: (value) => ["critical", "warning", "info"].includes(value),
+        validator: (value) => ["critical", "danger", "warning", "info"].includes(value),
     },
     title: {
         type: String,

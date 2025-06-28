@@ -4,14 +4,14 @@
         <NuxtPage />
 
         <!-- Global Alert Modal -->
-        <AlertModal
+        <!-- <AlertModal
             v-if="alertState.state.showAlert"
             :type="alertState.state.type"
             :title="alertState.state.title"
             :message="alertState.state.message"
             @dismiss="alertState.hideAlert"
             @confirm="alertState.hideAlert"
-        />
+        /> -->
     </NuxtLayout>
 </template>
 

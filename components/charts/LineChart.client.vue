@@ -11,10 +11,6 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
-    predictedLevels: {
-        type: Array,
-        default: () => [],
-    },
     bankHeight: {
         type: Number,
         default: 14,
@@ -47,10 +43,6 @@ const series = computed(() => [
         name: "ລະດັບນ້ຳ",
         data: props.currentLevels,
     },
-    {
-        name: "ລະດັບນ້ຳທີ່ຄາດຄະເນ",
-        data: props.predictedLevels,
-    },
 ]);
 
 // Chart options
@@ -82,7 +74,7 @@ const chartOptions = computed(() => ({
         parentHeightOffset: 0,
         redrawOnWindowResize: true,
     },
-    colors: ["#3B82F6", "#F97316"], // Blue for current, Orange for predicted
+    colors: ["#3B82F6"], // Blue for current
     stroke: {
         curve: "smooth",
         width: 2,
@@ -201,8 +193,8 @@ const chartOptions = computed(() => ({
     },
     stroke: {
         curve: "smooth",
-        width: [3, 2], // Thicker line for current
-        dashArray: [0, 4], // Solid for current, dashed for predicted
+        width: 3, // Line width for current
+        dashArray: 0, // Solid line for current
     },
     responsive: [
         {

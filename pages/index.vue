@@ -78,23 +78,27 @@
                 </div>
             </div>
 
-            <!-- current status -->
+            <!-- current status: Overall risk assessment based on all sensor readings -->
             <div class="bg-white rounded-lg shadow p-2 md:p-3">
                 <p class="font-bold text-xl md:text-2xl">
                     ສະຖານະຄວາມສ່ຽງປັດຈຸບັນ:
                 </p>
                 <div class="h-full flex flex-col text-center pb-2">
+                    <!-- Risk Level Colors: GREEN = normal/safe, YELLOW = warning, ORANGE = danger, RED = critical -->
                     <p
                         :class="`font-bold text-3xl md:text-4xl ${
                             riskLevel === 'normal'
-                                ? 'text-aqua-success'
+                                ? 'text-aqua-success'      // GREEN: Safe conditions
                                 : riskLevel === 'warning'
-                                  ? 'text-amber-500'
-                                  : 'text-aqua-critical'
+                                  ? 'text-amber-500'       // YELLOW: Warning level
+                                  : riskLevel === 'danger'
+                                    ? 'text-orange-500'    // ORANGE: Danger level
+                                    : 'text-aqua-critical' // RED: Critical/Emergency
                         }`"
                     >
                         {{ getRiskLevelText }}
                     </p>
+                    <!-- Action recommendations based on risk level -->
                     <p class="text-sm text-gray-600 mt-1">
                         {{ getRiskLevelActionText }}
                     </p>
@@ -171,6 +175,7 @@
                     <!-- <span class="text-sm ml-2 text-gray-600">{{
                         getWaterLevelStatus()
                     }}</span> -->
+                    <!-- Water Level Direction: UP arrow (red) = Rising water levels = DANGER -->
                     <svg
                         v-if="getWaterLevelDirection() === 'up'"
                         xmlns="http://www.w3.org/2000/svg"
@@ -186,6 +191,7 @@
                             d="M5 10l7-7m0 0l7 7m-7-7v18"
                         />
                     </svg>
+                    <!-- Water Level Direction: DOWN arrow (green) = Falling water levels = SAFE -->
                     <svg
                         v-else-if="getWaterLevelDirection() === 'down'"
                         xmlns="http://www.w3.org/2000/svg"
@@ -222,6 +228,7 @@
                     <!-- <span class="text-sm ml-2 text-gray-600">{{
                         getRainfallStatus()
                     }}</span> -->
+                    <!-- Rainfall Direction: UP arrow (red) = Increasing rainfall = DANGER -->
                     <svg
                         v-if="getRainfallDirection() === 'up'"
                         xmlns="http://www.w3.org/2000/svg"
@@ -237,6 +244,7 @@
                             d="M5 10l7-7m0 0l7 7m-7-7v18"
                         />
                     </svg>
+                    <!-- Rainfall Direction: DOWN arrow (green) = Decreasing rainfall = SAFE -->
                     <svg
                         v-else-if="getRainfallDirection() === 'down'"
                         xmlns="http://www.w3.org/2000/svg"
@@ -276,6 +284,7 @@
                     <!-- <span class="text-sm ml-2 text-gray-600">{{
                         getSoilMoistureStatus()
                     }}</span> -->
+                    <!-- Soil Moisture Direction: UP arrow (red) = Increasing moisture = DANGER (saturated soil) -->
                     <svg
                         v-if="getSoilMoistureDirection() === 'up'"
                         xmlns="http://www.w3.org/2000/svg"
@@ -291,6 +300,7 @@
                             d="M5 10l7-7m0 0l7 7m-7-7v18"
                         />
                     </svg>
+                    <!-- Soil Moisture Direction: DOWN arrow (green) = Decreasing moisture = SAFE (drying soil) -->
                     <svg
                         v-else-if="getSoilMoistureDirection() === 'down'"
                         xmlns="http://www.w3.org/2000/svg"
@@ -327,6 +337,7 @@
                     <span class="text-sm ml-2 text-gray-600">{{
                         getFlowRateStatus()
                     }}</span>
+                    <!-- Flow Rate Direction: UP arrow (orange) = Increasing flow = WARNING (fast moving water) -->
                     <svg
                         v-if="getFlowRateDirection() === 'up'"
                         xmlns="http://www.w3.org/2000/svg"
@@ -342,6 +353,7 @@
                             d="M5 10l7-7m0 0l7 7m-7-7v18"
                         />
                     </svg>
+                    <!-- Flow Rate Direction: DOWN arrow (green) = Decreasing flow = SAFE (slower water) -->
                     <svg
                         v-else-if="getFlowRateDirection() === 'down'"
                         xmlns="http://www.w3.org/2000/svg"
@@ -380,7 +392,6 @@
                     <WaterLevelChart
                         :key="`water-level-${componentKey}`"
                         :current-levels="waterLevelData.currentLevels"
-                        :predicted-levels="waterLevelData.predictedLevels"
                         :bank-height="waterLevelData.bankHeight"
                         :labels="waterLevelData.labels || daysOfWeek"
                     />
@@ -484,6 +495,24 @@
 </template>
 
 <script setup>
+/*
+ * DIRECTION INDICATORS MEANING:
+ * 
+ * 🔴 UP ARROW (RED/CRITICAL):
+ * - Water Level UP = DANGER (rising water = flood risk)
+ * - Rainfall UP = DANGER (more rain = flood risk)  
+ * - Soil Moisture UP = DANGER (saturated soil = landslide/flood risk)
+ * 
+ * 🟠 UP ARROW (ORANGE/WARNING):
+ * - Flow Rate UP = WARNING (faster water = erosion risk)
+ * 
+ * 🟢 DOWN ARROW (GREEN/SAFE):
+ * - Water Level DOWN = SAFE (falling water = decreasing flood risk)
+ * - Rainfall DOWN = SAFE (less rain = decreasing flood risk)
+ * - Soil Moisture DOWN = SAFE (drying soil = lower risk)
+ * - Flow Rate DOWN = SAFE (slower water = calmer conditions)
+ */
+
 import { ref, onMounted, computed, onBeforeUnmount } from "vue";
 import { useApi } from "~/composables/useApi";
 import { useChartData } from "~/composables/useChartData";
@@ -580,91 +609,161 @@ const getLastUpdateTime = () => {
 const riskLevel = computed(() => {
     if (!latestReadings.value) return "normal";
 
-    // Define thresholds - these should come from your device configuration in a real app
-    const waterLevelCritical = 12; // meters
-    const waterLevelWarning = 10; // meters
-    const flowRateCritical = 100; // m3/s
-    const flowRateWarning = 80; // m3/s
-    const soilMoistureCritical = 90; // percentage
-    const soilMoistureWarning = 80; // percentage
+    // Thresholds matching backend simulator configuration
+    const thresholds = {
+        waterLevel: { warning: 150, danger: 250, critical: 350 }, // cm
+        flowRate: { warning: 10, danger: 20, critical: 30 }, // m³/s  
+        rainfall: { warning: 10, danger: 25, critical: 50 }, // mm
+        soilMoisture: { warning: 70, danger: 85, critical: 95 } // %
+    };
 
-    // Check water level
-    if (
-        latestReadings.value.waterLevel &&
-        latestReadings.value.waterLevel.latest !== null
-    ) {
-        if (latestReadings.value.waterLevel.latest >= waterLevelCritical)
-            return "critical";
-        if (latestReadings.value.waterLevel.latest >= waterLevelWarning)
-            return "warning";
-    }
+    let maxRiskLevel = "normal";
+    const riskLevels = { normal: 0, warning: 1, danger: 2, critical: 3 };
+    
+    // Check each sensor and find highest risk level
+    const sensors = [
+        { name: 'waterLevel', data: latestReadings.value.waterLevel?.latest },
+        { name: 'flowRate', data: latestReadings.value.flowRate?.latest },
+        { name: 'rainfall', data: latestReadings.value.rainfall?.latest },
+        { name: 'soilMoisture', data: latestReadings.value.soilMoisture?.latest }
+    ];
 
-    // Check flow rate
-    if (
-        latestReadings.value.flowRate &&
-        latestReadings.value.flowRate.latest !== null
-    ) {
-        if (latestReadings.value.flowRate.latest >= flowRateCritical)
-            return "critical";
-        if (latestReadings.value.flowRate.latest >= flowRateWarning)
-            return "warning";
-    }
+    sensors.forEach(sensor => {
+        if (sensor.data !== null && sensor.data !== undefined) {
+            const sensorThresholds = thresholds[sensor.name];
+            let sensorRisk = "normal";
+            
+            if (sensor.data >= sensorThresholds.critical) {
+                sensorRisk = "critical";
+            } else if (sensor.data >= sensorThresholds.danger) {
+                sensorRisk = "danger";
+            } else if (sensor.data >= sensorThresholds.warning) {
+                sensorRisk = "warning";
+            }
+            
+            // Consider trends - if rising rapidly, increase risk level
+            const direction = getSensorDirection(sensor.name);
+            if (direction === 'up' && sensorRisk !== "normal") {
+                // Escalate risk if trending upward and already above normal
+                const currentLevel = riskLevels[sensorRisk];
+                if (currentLevel < 3) { // Don't go beyond critical
+                    sensorRisk = Object.keys(riskLevels)[currentLevel + 1];
+                }
+            }
+            
+            // Update max risk level
+            if (riskLevels[sensorRisk] > riskLevels[maxRiskLevel]) {
+                maxRiskLevel = sensorRisk;
+            }
+        }
+    });
 
-    // Check soil moisture
-    if (
-        latestReadings.value.soilMoisture &&
-        latestReadings.value.soilMoisture.latest !== null
-    ) {
-        if (latestReadings.value.soilMoisture.latest >= soilMoistureCritical)
-            return "critical";
-        if (latestReadings.value.soilMoisture.latest >= soilMoistureWarning)
-            return "warning";
-    }
-
-    return "normal";
+    return maxRiskLevel;
 });
 
-// Get risk level text
+// Helper function to get sensor direction
+const getSensorDirection = (sensorName) => {
+    switch (sensorName) {
+        case 'waterLevel': return getWaterLevelDirection();
+        case 'flowRate': return getFlowRateDirection();
+        case 'rainfall': return getRainfallDirection();
+        case 'soilMoisture': return getSoilMoistureDirection();
+        default: return null;
+    }
+};
+
+// Get risk level text with context
 const getRiskLevelText = computed(() => {
+    const riskingFactors = getRiskingFactors();
+    
     switch (riskLevel.value) {
         case "critical":
-            return "ວິກິດ";
+            return `ອັນຕະລາຍສູງ ${riskingFactors ? `(${riskingFactors})` : ''}`;
+        case "danger":
+            return `ອັນຕະລາຍ ${riskingFactors ? `(${riskingFactors})` : ''}`;
         case "warning":
-            return "ເຕືອນໄພ";
+            return `ເຕືອນໄພ ${riskingFactors ? `(${riskingFactors})` : ''}`;
         default:
             return "ປົກກະຕິ";
     }
 });
 
-// Get risk level action text
+// Get risk level action text with specific guidance
 const getRiskLevelActionText = computed(() => {
+    const trends = getTrendingFactors();
+    
     switch (riskLevel.value) {
         case "critical":
-            return "(ກະລຸນາອົບພະຍົບທັນທີ)";
+            return `ອົບພະຍົບທັນທີ! ${trends ? trends : 'ສະຖານະການອັນຕະລາຍ'}`;
+        case "danger":
+            return `ກຽມພ້ອມອົບພະຍົບ ${trends ? trends : 'ສະຖານະການເຂັ້ມງວດ'}`;
         case "warning":
-            return "(ກະລຸນາກຽມພ້ອມອົບພະຍົບ)";
+            return `ຕິດຕາມສະຖານະການ ${trends ? trends : 'ມີການປ່ຽນແປງ'}`;
         default:
-            return "(ບໍ່ຈໍາເປັນຕ້ອງດໍາເນີນການໃດໆ)";
+            return "ບໍ່ຈໍາເປັນດໍາເນີນການ";
     }
 });
 
-// Determine soil moisture status text
-const getSoilMoistureStatus = () => {
-    if (
-        !latestReadings.value ||
-        !latestReadings.value.soilMoisture ||
-        latestReadings.value.soilMoisture.latest === null
-    ) {
-        return "";
+// Get factors causing risk (which sensors are problematic)
+const getRiskingFactors = () => {
+    if (!latestReadings.value) return "";
+    
+    const factors = [];
+    const thresholds = {
+        waterLevel: { warning: 150, danger: 250, critical: 350 },
+        flowRate: { warning: 10, danger: 20, critical: 30 },
+        rainfall: { warning: 10, danger: 25, critical: 50 },
+        soilMoisture: { warning: 70, danger: 85, critical: 95 }
+    };
+    
+    // Check each sensor for risk levels
+    if (latestReadings.value.waterLevel?.latest >= thresholds.waterLevel.warning) {
+        factors.push("ລະດັບນ້ຳ");
     }
-
-    const value = latestReadings.value.soilMoisture.latest;
-    if (value > 80) return "(ສູງກວ່າປົກກະຕິ)";
-    if (value < 30) return "(ຕ່ຳກວ່າປົກກະຕິ)";
-    return "(ປົກກະຕິ)";
+    if (latestReadings.value.rainfall?.latest >= thresholds.rainfall.warning) {
+        factors.push("ຝົນຕົກ");
+    }
+    if (latestReadings.value.flowRate?.latest >= thresholds.flowRate.warning) {
+        factors.push("ການໄຫຼ");
+    }
+    if (latestReadings.value.soilMoisture?.latest >= thresholds.soilMoisture.warning) {
+        factors.push("ດິນຊຸ່ມ");
+    }
+    
+    return factors.length > 0 ? factors.join(", ") : "";
 };
 
+// Get trending information for more context
+const getTrendingFactors = () => {
+    const trends = [];
+    
+    if (getWaterLevelDirection() === 'up') trends.push("ນ້ຳຂຶ້ນ");
+    if (getRainfallDirection() === 'up') trends.push("ຝົນເພີ່ມ");
+    if (getFlowRateDirection() === 'up') trends.push("ໄຫຼແຮງ");
+    if (getSoilMoistureDirection() === 'up') trends.push("ດິນອິ່ມ");
+    
+    return trends.length > 0 ? `(${trends.join(", ")})` : "";
+};
+
+// Determine soil moisture status text (unused - kept for potential future use)
+// const getSoilMoistureStatus = () => {
+//     if (
+//         !latestReadings.value ||
+//         !latestReadings.value.soilMoisture ||
+//         latestReadings.value.soilMoisture.latest === null
+//     ) {
+//         return "";
+//     }
+
+//     const value = latestReadings.value.soilMoisture.latest;
+//     if (value > 80) return "(ສູງກວ່າປົກກະຕິ)";
+//     if (value < 30) return "(ຕ່ຳກວ່າປົກກະຕິ)";
+//     return "(ປົກກະຕິ)";
+// };
+
 // Determine soil moisture direction
+// UP = DANGER (increasing soil moisture indicates saturation, potential landslides/flooding)
+// DOWN = SAFE (decreasing soil moisture indicates drying, lower flood risk)
 const getSoilMoistureDirection = () => {
     if (
         !latestReadings.value ||
@@ -679,12 +778,12 @@ const getSoilMoistureDirection = () => {
     );
     if (values.length < 2) return null;
 
-    const current = values[values.length - 1];
-    const previous = values[values.length - 2];
+    const current = values[values.length - 1];   // Most recent soil moisture reading
+    const previous = values[values.length - 2];  // Previous soil moisture reading
 
-    if (current > previous) return "up";
-    if (current < previous) return "down";
-    return null;
+    if (current > previous) return "up";     // DANGER: Soil getting more saturated
+    if (current < previous) return "down";   // SAFE: Soil drying out
+    return null;  // No change or insufficient data
 };
 
 // Determine flow rate status text
@@ -697,13 +796,15 @@ const getFlowRateStatus = () => {
         return "";
     }
 
-    const value = latestReadings.value.flowRate.latest;
-    if (value > 100) return "(ສູງກວ່າປົກກະຕິ)";
-    if (value < 20) return "(ຕ່ຳກວ່າປົກກະຕິ)";
-    return "(ປົກກະຕິ)";
+    // const value = latestReadings.value.flowRate.latest;
+    // if (value > 100) return "(ສູງກວ່າປົກກະຕິ)";
+    // if (value < 20) return "(ຕ່ຳກວ່າປົກກະຕິ)";
+    // return "(ປົກກະຕິ)";
 };
 
 // Determine flow rate direction
+// UP = WARNING (increasing flow rate indicates faster moving water, erosion risk)
+// DOWN = SAFE (decreasing flow rate indicates calmer water conditions)
 const getFlowRateDirection = () => {
     if (
         !latestReadings.value ||
@@ -718,31 +819,33 @@ const getFlowRateDirection = () => {
     );
     if (values.length < 2) return null;
 
-    const current = values[values.length - 1];
-    const previous = values[values.length - 2];
+    const current = values[values.length - 1];   // Most recent flow rate reading
+    const previous = values[values.length - 2];  // Previous flow rate reading
 
-    if (current > previous) return "up";
-    if (current < previous) return "down";
-    return null;
+    if (current > previous) return "up";     // WARNING: Flow rate increasing (faster water)
+    if (current < previous) return "down";   // SAFE: Flow rate decreasing (slower water)
+    return null;  // No change or insufficient data
 };
 
-// Determine water level status text
-const getWaterLevelStatus = () => {
-    if (
-        !latestReadings.value ||
-        !latestReadings.value.waterLevel ||
-        latestReadings.value.waterLevel.latest === null
-    ) {
-        return "";
-    }
+// Determine water level status text (unused - kept for potential future use)
+// const getWaterLevelStatus = () => {
+//     if (
+//         !latestReadings.value ||
+//         !latestReadings.value.waterLevel ||
+//         latestReadings.value.waterLevel.latest === null
+//     ) {
+//         return "";
+//     }
 
-    const value = latestReadings.value.waterLevel.latest;
-    if (value > 10) return "(ສູງກວ່າປົກກະຕິ)";
-    if (value < 2) return "(ຕ່ຳກວ່າປົກກະຕິ)";
-    return "(ປົກກະຕິ)";
-};
+//     const value = latestReadings.value.waterLevel.latest;
+//     if (value > 10) return "(ສູງກວ່າປົກກະຕິ)";
+//     if (value < 2) return "(ຕ່ຳກວ່າປົກກະຕິ)";
+//     return "(ປົກກະຕິ)";
+// };
 
 // Determine water level direction
+// UP = DANGER (rising water levels indicate potential flooding)
+// DOWN = SAFE (falling water levels indicate decreasing flood risk)
 const getWaterLevelDirection = () => {
     if (
         !latestReadings.value ||
@@ -757,32 +860,34 @@ const getWaterLevelDirection = () => {
     );
     if (values.length < 2) return null;
 
-    const current = values[values.length - 1];
-    const previous = values[values.length - 2];
+    const current = values[values.length - 1];   // Most recent reading
+    const previous = values[values.length - 2];  // Previous reading
 
-    if (current > previous) return "up";
-    if (current < previous) return "down";
-    return null;
+    if (current > previous) return "up";     // DANGER: Water level rising
+    if (current < previous) return "down";   // SAFE: Water level falling
+    return null;  // No change or insufficient data
 };
 
-// Determine rainfall status text
-const getRainfallStatus = () => {
-    if (
-        !latestReadings.value ||
-        !latestReadings.value.rainfall ||
-        latestReadings.value.rainfall.latest === null
-    ) {
-        return "";
-    }
+// Determine rainfall status text (unused - kept for potential future use)  
+// const getRainfallStatus = () => {
+//     if (
+//         !latestReadings.value ||
+//         !latestReadings.value.rainfall ||
+//         latestReadings.value.rainfall.latest === null
+//     ) {
+//         return "";
+//     }
 
-    const value = latestReadings.value.rainfall.latest;
-    if (value > 20) return "(ຝົນຕົກໜັກ)";
-    if (value > 5) return "(ຝົນຕົກປານກາງ)";
-    if (value > 0) return "(ຝົນຕົກເບົາ)";
-    return "(ບໍ່ມີຝົນຕົກ)";
-};
+//     const value = latestReadings.value.rainfall.latest;
+//     if (value > 20) return "(ຝົນຕົກໜັກ)";
+//     if (value > 5) return "(ຝົນຕົກປານກາງ)";
+//     if (value > 0) return "(ຝົນຕົກເບົາ)";
+//     return "(ບໍ່ມີຝົນຕົກ)";
+// };
 
 // Determine rainfall direction
+// UP = DANGER (increasing rainfall can lead to flooding)
+// DOWN = SAFE (decreasing rainfall reduces flood risk)
 const getRainfallDirection = () => {
     if (
         !latestReadings.value ||
@@ -797,12 +902,12 @@ const getRainfallDirection = () => {
     );
     if (values.length < 2) return null;
 
-    const current = values[values.length - 1];
-    const previous = values[values.length - 2];
+    const current = values[values.length - 1];   // Most recent rainfall reading
+    const previous = values[values.length - 2];  // Previous rainfall reading
 
-    if (current > previous) return "up";
-    if (current < previous) return "down";
-    return null;
+    if (current > previous) return "up";     // DANGER: Rainfall increasing
+    if (current < previous) return "down";   // SAFE: Rainfall decreasing
+    return null;  // No change or insufficient data
 };
 
 // Function to load data based on selected device
@@ -924,14 +1029,12 @@ const waterLevelData = computed(() => {
     if (!latestReadings.value || !latestReadings.value.waterLevel) {
         return {
             currentLevels: [],
-            predictedLevels: [],
             bankHeight: 14,
             labels: [],
         };
     }
     return {
         currentLevels: latestReadings.value.waterLevel.current || [],
-        predictedLevels: latestReadings.value.waterLevel.predicted || [],
         bankHeight: 14, // This should come from your device configuration
         labels: latestReadings.value.labels || [],
     };
